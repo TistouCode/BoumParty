@@ -1,9 +1,11 @@
 // server.js - Serveur principal pour le jeu Bomb Party
 const express = require('express');
+const fs = require('fs');
 const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
-const fs = require('fs');
+
+const Boum = require('./public/game/game.js');
 
 
 // Chargement du dictionnaire de mots français
@@ -52,7 +54,9 @@ app.post('/:gameId/init', express.json(), (req, res) => {
     console.log(gameId)
     console.log(players);
     console.log(settings)
-    // games.set(gameId, data);
+    games.set(gameId, new Boum(gameId, settings.timerDuration, settings.lifePerPlayer, players));
+    console.log(games.get(gameId));
+    console.log("score : ", games.get(gameId).scores);
     res.status(200).send({ "Response": true });
 
 });

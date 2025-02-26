@@ -3,7 +3,7 @@
  * @brief Classe Quiz
  * @details Classe permettant de gérer une partie de quiz
  */
-export class Boum {
+class Boum {
 
     /**
      * @brief Constructeur de la classe Boum
@@ -12,11 +12,11 @@ export class Boum {
      * @param duration Durée d'une manche
      * @param players Liste des joueurs
      */
-    constructor(id, timerDuration = 6, players = []) {
+    constructor(id, timerDuration = 6, lifePerPlayer = 3, players = []) {
         this._id = id;                          // Identifiant de la partie
         this._scores = new Map();
         this._timerDuration = timerDuration;
-
+        this._lifePerPlayer = lifePerPlayer;
         // Initialisation des joueurs
         players.forEach(player => this.addPlayer(player));
     }
@@ -32,12 +32,6 @@ export class Boum {
         this._scores = value;
     }
 
-
-
-
-
-
-
     /**
      * @brief Ajoute un joueur à la partie
      * @param player Joueur à ajouter
@@ -51,3 +45,4 @@ export class Boum {
         });
     }
 }
+module.exports = Boum;
