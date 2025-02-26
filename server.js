@@ -47,21 +47,38 @@ io.on('connection', (socket) => {
 app.post('/:gameId/init', express.json(), (req, res) => {
 
     const gameId = req.params.gameId;
-    const data = req.body;
-    console.log(data);
-    games.set('data', data);
+    const settings = req.body.settings;
+    const players = req.body.players;
+    console.log(gameId)
+    console.log(players);
+    console.log(settings)
+    // games.set(gameId, data);
+    res.status(200).send({ "Response": true });
 
-    res.status(200).send({ data: data });
 });
 
 app.get('/:gameId/:token', express.json(), (req, res) => {
     const gameId = req.params.gameId;
     const token = req.params.token;
+
+    if(games.has(gameId)){
+        res.status(200).send({ "Response": true });
+    }
 });
 
 
 
-
+// {
+//     "settings": {
+//     "lifePerPlayer": 3,
+//         "timerDuration": 10
+// },
+//     "players": {
+//     "aaaa": "Mathis",
+//         "bbbb": "Esteban",
+//         "cccc": "Robin"
+// }
+// }
 
 
 
