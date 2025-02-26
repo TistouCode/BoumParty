@@ -1,7 +1,6 @@
 const socket = io();
 
 socket.on('message', (msg) => {
-    console.log('fehefu')
     const li = document.createElement('li');
     li.textContent = msg;
     document.getElementById('messages').appendChild(li);
