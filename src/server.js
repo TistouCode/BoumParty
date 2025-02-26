@@ -5,8 +5,11 @@ const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
 
-const Boum = require('./public/game/game.js');
+const Boum = require('../public/game/game.js');
 
+
+const { fileURLToPath } = require('url');
+const dirname = path.dirname;
 
 // Chargement du dictionnaire de mots français
 const dictionary = fs.readFileSync('dictionary-fr.txt', 'utf8').split('\n');
@@ -34,7 +37,10 @@ const games = new Map();
 
 io.on('connection', (socket) => {
     console.log('Un utilisateur s\'est connecté');
-
+    const token = socket.handshake.query.token;
+    const gameId = socket.handshake.query.gameId;
+    console.log("token : ", token);
+    console.log("gameId: ", gameId)
     socket.on('message', (msg) => {
         console.log('Message reçu:', msg);
         io.emit('message', [msg, socket.id]); // Envoie le message à tous les clients
@@ -43,6 +49,7 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         console.log('Un utilisateur s\'est déconnecté');
     });
+
 
 });
 
@@ -54,36 +61,36 @@ app.post('/:gameId/init', express.json(), (req, res) => {
     console.log(gameId)
     console.log(players);
     console.log(settings)
-    games.set(gameId, new Boum(gameId, settings.timerDuration, settings.lifePerPlayer, players));
+    try{
+
+        games.set(gameId, new Boum(gameId, settings.timerDuration, settings.lifePerPlayer, players));
+        res.status(200).json({
+            success: true,
+            message: "Game created"
+        });
+    }catch (e) {
+        res.status(500).json({
+            success: false,
+            message: e.message
+        });
+    }
+
     console.log(games.get(gameId));
     console.log("score : ", games.get(gameId).scores);
-    res.status(200).send({ "Response": true });
+
 
 });
 
 app.get('/:gameId/:token', express.json(), (req, res) => {
     const gameId = req.params.gameId;
     const token = req.params.token;
-
+    console.log("gameId : ", gameId);
     if(games.has(gameId)){
-        res.status(200).send({ "Response": true });
+        res.sendFile(path.join(__dirname, '../public', 'index.html'));
+    }else{
+        res.redirect('/403');
     }
 });
-
-
-
-// {
-//     "settings": {
-//     "lifePerPlayer": 3,
-//         "timerDuration": 10
-// },
-//     "players": {
-//     "aaaa": "Mathis",
-//         "bbbb": "Esteban",
-//         "cccc": "Robin"
-// }
-// }
-
 
 
 
