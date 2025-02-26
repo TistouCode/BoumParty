@@ -25,11 +25,11 @@ app.use(express.json()); // Pour traiter le JSON (si besoin)
 
 
 // Configuration pour servir les fichiers statiques
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join('src')));
 
 // Route principale
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'src', 'index.html'));
 });
 
 // Route pour la page de jeu
@@ -86,7 +86,7 @@ app.get('/:gameId/:token', express.json(), (req, res) => {
     const token = req.params.token;
     console.log("gameId : ", gameId);
     if(games.has(gameId)){
-        res.sendFile(path.join(__dirname, '../public', 'index.html'));
+        res.sendFile(path.join(__dirname, '../src', 'index.html'));
     }else{
         res.redirect('/403');
     }

@@ -1,0 +1,23 @@
+{
+    "settings": {
+        "lifePerPlayer": 3,
+        "timerDuration": 10
+    },
+    "players": [
+        {
+            "username": "Mathis",
+            "uuid": "fjief345",
+            "token": "aaaa"
+        },
+        {
+            "username": "Esteban",
+            "uuid": "fepz23",
+            "token": "bbbb"
+        },
+        {
+            "username": "Robin",
+            "uuid": "gfrghj23",
+            "token": "cccc"
+        }
+    ]
+}
