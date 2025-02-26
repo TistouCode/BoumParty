@@ -29,38 +29,22 @@ app.use(express.static(path.join('public')));
 
 // Route principale
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, '../public', 'game.html'));
 });
 
 // Route pour la page de jeu
 const games = new Map();
 
-io.on('connection', (socket) => {
-    console.log('Un utilisateur s\'est connecté');
-    const token = socket.handshake.query.token;
-    const gameId = socket.handshake.query.gameId;
-    console.log("token : ", token);
-    console.log("gameId: ", gameId)
-    socket.on('message', (msg) => {
-        console.log('Message reçu:', msg);
-        io.emit('message', [msg, socket.id]); // Envoie le message à tous les clients
-    });
 
-    socket.on('disconnect', () => {
-        console.log('Un utilisateur s\'est déconnecté');
-    });
-
-
-});
 
 app.post('/:gameId/init', express.json(), (req, res) => {
 
     const gameId = req.params.gameId;
     const settings = req.body.settings;
     const players = req.body.players;
-    console.log(gameId)
-    console.log(players);
-    console.log(settings)
+    // console.log(gameId)
+    // console.log(players);
+    // console.log(settings)
     try{
 
         games.set(gameId, new Boum(gameId, settings.timerDuration, settings.lifePerPlayer, players));
@@ -75,8 +59,8 @@ app.post('/:gameId/init', express.json(), (req, res) => {
         });
     }
 
-    console.log(games.get(gameId));
-    console.log("score : ", games.get(gameId).scores);
+    // console.log(games.get(gameId));
+    // console.log("score : ", games.get(gameId).scores);
 
 
 });
@@ -84,33 +68,70 @@ app.post('/:gameId/init', express.json(), (req, res) => {
 app.get('/:gameId/:token', express.json(), (req, res) => {
     const gameId = req.params.gameId;
     const token = req.params.token;
-    // Vérifier si la partie existe
-    if (!games.has(gameId)) {
-        res.redirect('/404');
-        return;
+
+    console.log("app.get / gameId : ", typeof(gameId) );
+    console.log("app.get / token : ", token);
+    console.log("games : ", games.get(gameId));
+    if(games.has(gameId)){
+        console.log("game found")
+        let playerFound = false;
+        let playerUuid = '';
+        games.get(gameId)._scores.forEach((playerData, playerName) => {
+            // console.log(playerData)
+            if (playerData.token === token) {
+                playerFound = true;
+                playerUuid = token;
+            }
+        });
+        if (playerFound) {
+            console.log("player found")
+            res.sendFile(path.join(__dirname, '../public', 'game.html'));
+        }
+        else {
+            // Rediriger vers une page 403 si le token n'est pas trouvé
+            res.redirect('/403');
+        }
     }
 
-    // Vérifier si le token est valide en parcourant les joueurs
-    let playerFound = false;
-    let playerUuid = '';
-    games.get(gameId)._scores.forEach((playerData, playerName) => {
-        console.log(playerData)
-        if (playerData.token === token) {
-            playerFound = true;
-            playerUuid = token;
-        }
-    });
-    if (playerFound) {
-        console.log("player found")
-        res.sendFile(path.join(__dirname, '../public', 'index.html'));
-    }
-    else {
-        // Rediriger vers une page 403 si le token n'est pas trouvé
-        res.redirect('/403');
-    }
 });
 
 
+
+io.on('connection', (socket) => {
+
+    console.log('Un utilisateur s\'est connecté');
+    const token = socket.handshake.query.token;
+    const gameId = socket.handshake.query.gameId;
+    console.log("token : ", token);
+    console.log("gameId: ", gameId)
+    if(!games.has(gameId)){
+        console.log("game not found")
+        return;
+    }
+
+    let currentGame = games.get(gameId);
+    let pseudonyme = '';
+
+    // Récupération du pseudonyme du joueur
+    currentGame._scores.forEach((playerData, playerName) => {
+        if (playerData.token === token) {
+            pseudonyme = playerName;
+            currentGame._scores.get(playerName).connected = true;
+        }
+    });
+    console.log("SCORE : ", currentGame._scores)
+
+    socket.on('message', (msg) => {
+        console.log('Message reçu:', msg);
+        io.emit('message', [msg, socket.id]); // Envoie le message à tous les clients
+    });
+
+    socket.on('disconnect', () => {
+        console.log('Un utilisateur s\'est déconnecté');
+    });
+
+
+});
 
 
 
