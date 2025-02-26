@@ -25,11 +25,11 @@ app.use(express.json()); // Pour traiter le JSON (si besoin)
 
 
 // Configuration pour servir les fichiers statiques
-app.use(express.static(path.join('src')));
+app.use(express.static(path.join('public')));
 
 // Route principale
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'src', 'index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Route pour la page de jeu
@@ -84,10 +84,28 @@ app.post('/:gameId/init', express.json(), (req, res) => {
 app.get('/:gameId/:token', express.json(), (req, res) => {
     const gameId = req.params.gameId;
     const token = req.params.token;
-    console.log("gameId : ", gameId);
-    if(games.has(gameId)){
-        res.sendFile(path.join(__dirname, '../src', 'index.html'));
-    }else{
+    // Vérifier si la partie existe
+    if (!games.has(gameId)) {
+        res.redirect('/404');
+        return;
+    }
+
+    // Vérifier si le token est valide en parcourant les joueurs
+    let playerFound = false;
+    let playerUuid = '';
+    games.get(gameId)._scores.forEach((playerData, playerName) => {
+        console.log(playerData)
+        if (playerData.token === token) {
+            playerFound = true;
+            playerUuid = token;
+        }
+    });
+    if (playerFound) {
+        console.log("player found")
+        res.sendFile(path.join(__dirname, '../public', 'index.html'));
+    }
+    else {
+        // Rediriger vers une page 403 si le token n'est pas trouvé
         res.redirect('/403');
     }
 });

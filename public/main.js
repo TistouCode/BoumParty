@@ -2,12 +2,7 @@
 const gameId = window.location.pathname.split('/')[1];
 const token = window.location.pathname.split('/')[2];
 
-const socket = io({
-    query: {
-        gameId : gameId,
-        token :token
-    }
-});
+const socket = io();
 
 socket.on('message', (msg) => {
     const li = document.createElement('li');
