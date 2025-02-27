@@ -43,6 +43,28 @@ socket.on('user-list', (players) => {
         li.textContent = player[0]; // Nom du joueur
         li.id = player[1].token;    // On met le token en id pour identifier chaque joueur
         li.classList.add("player", "p-2", "rounded-lg");
+        console.log(player)
+
+        // Affichage des vies sous forme de cœurs
+        let heartList = document.createElement("ul");
+        heartList.classList.add("flex", "space-x-1"); // On ajoute de l'espace entre les cœurs
+
+        // Afficher 3 cœurs, certains vides si le joueur a perdu des vies
+        let lives = player[1].life;
+        console.log("AAPPAPAPAPPA", lives)
+        for (let i = 0; i < lives; i++) {
+            let heart = document.createElement("li");
+            heart.textContent = i < lives ? "❤️" : "🤍"; // Cœur plein si la vie est encore là, sinon cœur vide
+            heart.classList.add("text-xl"); // Agrandir les cœurs
+            heartList.appendChild(heart);
+            console.log("LIVES : ", lives)
+        }
+
+        // Ajouter la liste des cœurs à chaque joueur
+        li.appendChild(heartList);
+
+
+
 
         // Si le joueur est actif, il reste rouge
         if (player[1].token === currentActualPlayerToken) {
@@ -57,6 +79,17 @@ socket.on('user-list', (players) => {
         playerListElement.appendChild(li);
     });
 });
+
+socket.on('boum', (player)=>{
+    console.log(player)
+
+    let playerElement = document.getElementById(player.token);
+    console.log("PLAYER ELEMENT", playerElement)
+    playerElement.lastElementChild.lastElementChild.remove()
+
+
+})
+
 
 // Stocker le joueur actif
 let currentActualPlayerToken = null;
@@ -91,6 +124,18 @@ let sequence = document.getElementById('sequence');
 socket.on('sequence', (seq) => {
     console.log("Séquence reçue :", seq);
     sequence.textContent = seq;
+})
+
+socket.on('timer', (time) => {
+
+    let timer = document.getElementById('timer');
+    timer.textContent = time;
+})
+
+socket.on('player-death', (player) => {
+    console.log("Joueur mort :", player);
+    let playerElement = document.getElementById(player.token);
+    playerElement.classList.add("opacity-20");
 })
 
 //

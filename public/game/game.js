@@ -1,5 +1,5 @@
 class Boum {
-    constructor(id, bombDuration = 2, lifePerPlayer = 3, players = [], inGame = false) {
+    constructor(id, bombDuration = 5, lifePerPlayer = 3, players = [], inGame = false) {
         this._id = id;
         this._scores = new Map();
         this._bombDuration = bombDuration;
@@ -33,7 +33,8 @@ class Boum {
             score: 0,
             life: this._lifePerPlayer,
             play: false,
-            connected: false
+            connected: false,
+            live: true
         });
     }
 
@@ -41,10 +42,19 @@ class Boum {
      * @brief Tire un joueur au hasard
      */
     drawActualPlayer() {
-        let players = Array.from(this._scores.values());
-        let actualPlayer = players[Math.floor(Math.random() * players.length)];
-        this._actualPlayer = actualPlayer;
-        return actualPlayer;
+        // Filtrer les joueurs qui sont encore en vie
+        let alivePlayers = Array.from(this._scores.values()).filter(player => player.live === true);
+
+        // Si il y a des joueurs vivants
+        if (alivePlayers.length > 0) {
+            // Tirer au hasard un joueur parmi les vivants
+            let actualPlayer = alivePlayers[Math.floor(Math.random() * alivePlayers.length)];
+            this._actualPlayer = actualPlayer;
+            return actualPlayer;
+        } else {
+            console.log("Aucun joueur en vie !");
+            return null; // Retourne null si aucun joueur n'est vivant
+        }
     }
 
     /**
@@ -72,11 +82,31 @@ class Boum {
     startTimer(io, gameId) {
         if (!this._intervalRunning) {
             this._intervalRunning = true;
+            let chrono = this._bombDuration;
             this._interval = setInterval(() => {
-                this.switchPlayer(io, gameId);
-                this._currentSequence = this.generateSequence();
-                io.to(gameId).emit('sequence', this._currentSequence);
-            }, this._bombDuration*1000);
+
+                chrono--;
+                io.to(gameId).emit('timer', chrono);
+                if(chrono <= 0){
+                    console.log("BOUM")
+                    this._actualPlayer.life--;
+                    if(this._actualPlayer.life <= 0){
+                        console.log("LE JOUEUR EST MORT : ", this._actualPlayer);
+                        console.log("SCORES : ", this._scores);
+                        // Supprimer le joueur de _scores par son username
+                        console.log(this._actualPlayer)
+                        this._actualPlayer.live = false;
+                        io.to(gameId).emit('player-death', this._actualPlayer);
+                    }
+                    io.to(gameId).emit('boum', this._actualPlayer);
+                    this.switchPlayer(io, gameId);
+
+                    chrono = this._bombDuration;
+                    this._currentSequence = this.generateSequence();
+                    io.to(gameId).emit('sequence', this._currentSequence);
+                }
+
+            }, 1000);
         }
     }
 

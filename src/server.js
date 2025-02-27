@@ -143,6 +143,7 @@ io.on('connection', (socket) => {
     if (currentGame._actualPlayer) {
         socket.emit('actual-player', currentGame._actualPlayer.token);
         socket.emit('sequence', currentGame._currentSequence);
+        // socket.emit('timer', currentGame._bombDuration);
     }
 
     // Lancer la partie uniquement si elle n'est pas en cours
