@@ -11,7 +11,6 @@ const socket = io(
     }
 );
 
-console.log("HHHHHH")
 
 let divPlayer = document.getElementById('divPlayer');
 let userList = document.getElementById('userList');
@@ -23,14 +22,23 @@ socket.on('game-start', () => {
 });
 
 
+
 let inputProposition = document.getElementById('inputProposition');
 inputProposition.addEventListener('keydown', function(event) {
     if (event.key === 'Enter') {
-        alert('Vous avez appuyé sur Entrée !');
         let proposition = inputProposition.value;
         socket.emit('proposition', proposition);
+        inputProposition.value = '';
     }
 });
+
+
+socket.on('word', (word) => {
+    console.log('Mot reçu :', word);
+    let playerElement = document.getElementById(token);
+    playerElement.children[1].textContent = word;
+})
+
 
 socket.on('user-list', (players) => {
     console.log("Liste des joueurs mise à jour :", players);
@@ -51,7 +59,6 @@ socket.on('user-list', (players) => {
 
         // Afficher 3 cœurs, certains vides si le joueur a perdu des vies
         let lives = player[1].life;
-        console.log("AAPPAPAPAPPA", lives)
         for (let i = 0; i < lives; i++) {
             let heart = document.createElement("li");
             heart.textContent = i < lives ? "❤️" : "🤍"; // Cœur plein si la vie est encore là, sinon cœur vide
@@ -60,11 +67,10 @@ socket.on('user-list', (players) => {
             console.log("LIVES : ", lives)
         }
 
+        let proposition = document.createElement("p");
         // Ajouter la liste des cœurs à chaque joueur
         li.appendChild(heartList);
-
-
-
+        li.appendChild(proposition);
 
         // Si le joueur est actif, il reste rouge
         if (player[1].token === currentActualPlayerToken) {
@@ -84,8 +90,9 @@ socket.on('user-list', (players) => {
 // Signal reçu lorsqu'un joueur a perdu une vie
 socket.on('boum', (player)=>{
     let playerElement = document.getElementById(player.token);
-    console.log("PLAYER ELEMENT", playerElement)
-    playerElement.lastElementChild.lastElementChild.remove()
+    console.log("PLAYER ELEMENT", playerElement.children)
+    playerElement.children[0].lastElementChild.remove()
+    playerElement.children[1].textContent = player.actualWord
 })
 
 
@@ -136,35 +143,3 @@ socket.on('player-death', (player) => {
     playerElement.classList.add("opacity-20");
 })
 
-//
-// socket.on('message', (msg) => {
-//     const li = document.createElement('li');
-//     li.textContent = msg;
-//     document.getElementById('messages').appendChild(li);
-// });
-//
-// function sendMessage() {
-//     const input = document.getElementById('messageInput');
-//     socket.emit('message', input.value);
-//     input.value = '';
-// }
-//
-// function join(){
-//     console.log("neuille")
-//     let iPseudo = document.getElementById('pseudo');
-//     let pseudo = iPseudo.value;
-//     if(pseudo){
-//         console.log("jiefjuoejo")
-//         socket.emit('new-user', pseudo);
-//     }
-// }
-//
-// socket.on('user-list', (listUser) => {
-//     const ul = document.getElementById('messages');
-//     ul.innerHTML = '';
-//     listUser.forEach((user) => {
-//         const li = document.createElement('li');
-//         li.textContent = user;
-//         ul.appendChild(li);
-//     });
-// });

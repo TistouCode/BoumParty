@@ -143,47 +143,37 @@ io.on('connection', (socket) => {
     if (currentGame._actualPlayer) {
         socket.emit('actual-player', currentGame._actualPlayer.token);
         socket.emit('sequence', currentGame._currentSequence);
+        socket.emit('word', currentGame._actualPlayer.actualWord);
         // socket.emit('timer', currentGame._bombDuration);
     }
 
     // Lancer la partie uniquement si elle n'est pas en cours
     currentGame.startGame(io, gameId);
+    // Envoyer le mot à tous les clients
 
-    // Envoyer l'état actuel au nouvel arrivant
-    // socket.emit('actual-player', currentGame._actualPlayer.token);
-    //
+    // Gérer les propositions de mots
+    socket.on('proposition', (proposition) => {
+        console.log('Proposition reçue:', proposition);
+        io.to(gameId).emit('word', proposition);
+        currentGame._actualPlayer.actualWord = proposition;
+        // Vérifier si le mot est valide
+        if (isValidWord(proposition, currentGame._currentSequence, currentGame._usedWords)) {
+            console.log('Mot valide !');
 
+            // Ajouter le mot à la liste des mots utilisés
+            currentGame._usedWords.push(proposition);
 
-
-    // // Lancement de la partie
-    // if(!currentGame._inGame){
-    //
-    //
-    //     currentGame._inGame = true;
-    //     console.log("DEBUT DE LA PARTIE")
-    //     currentGame.drawActualPlayer();
-    //     currentGame._actualPlayer.play = true;
-    //     console.log("actualPlayer : ",  currentGame._actualPlayer);
-    //     io.to(gameId).emit('game-start');
-    //     io.to(gameId).emit('actual-player',  currentGame._actualPlayer.token);
-    //     console.log("TOKEN : ",  currentGame._actualPlayer.token)
-    //
-    // }
-    // // Éviter plusieurs setInterval
-    // if (!currentGame.intervalRunning) {
-    //     currentGame.intervalRunning = true;
-    //     currentGame.interval = setInterval(() => {
-    //         currentGame.drawActualPlayer();
-    //         io.to(gameId).emit('actual-player', currentGame._actualPlayer.token);
-    //     }, 3000);
-    // }
-    //
+            // Ajouter le mot au joueur actif
+            // currentGame._scores.get(currentGame._actualPlayer.username).words.push(proposition);
 
 
-    // Envoie la séquence de lettres à tous les clients
-    // games.get(gameId)._scores.forEach((playerData, playerName) => {
-    //
-    // }
+
+            // Changer de joueur
+            currentGame.switchPlayer(io, gameId);
+        } else {
+            console.log('Mot invalide !');
+        }
+    })
 
 
 

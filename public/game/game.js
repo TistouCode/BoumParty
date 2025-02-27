@@ -9,6 +9,7 @@ class Boum {
         this._interval = null; // Stocke le setInterval
         this._intervalRunning = false; // Vérifie si le timer tourne
         this._currentSequence = null; // Séquence actuelle
+        this._usedWords = []; // Mots déjà utilisés
 
         // Initialisation des joueurs
         players.forEach(player => this.addPlayer(player));
@@ -34,7 +35,8 @@ class Boum {
             life: this._lifePerPlayer,
             play: false,
             connected: false,
-            live: true
+            live: true,
+            actualWord: '',
         });
     }
 
@@ -104,9 +106,11 @@ class Boum {
                     chrono = this._bombDuration;
                     this._currentSequence = this.generateSequence();
                     io.to(gameId).emit('sequence', this._currentSequence);
+
                 }
 
             }, 1000);
+
         }
     }
 
