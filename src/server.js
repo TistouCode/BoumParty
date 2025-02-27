@@ -4,19 +4,17 @@ const fs = require('fs');
 const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
+const Boum = require('../public/game/game.js'); // Importer la classe Boum
 
-const Boum = require('../public/game/game.js');
-
-
-const { fileURLToPath } = require('url');
-const dirname = path.dirname;
+const { fileURLToPath } = require('url'); // Pour obtenir le chemin du fichier
+const dirname = path.dirname; // Pour obtenir le répertoire du fichier
 
 // Chargement du dictionnaire de mots français
 const dictionary = fs.readFileSync('dictionary-fr.txt', 'utf8').split('\n');
 
-const app = express();
-const server = http.createServer(app);
-const io = socketIo(server);
+const app = express(); // Créer une application Express
+const server = http.createServer(app); // Créer un serveur HTTP
+const io = socketIo(server); // Créer une instance de Socket.IO
 
 
 
@@ -47,11 +45,7 @@ app.post('/:gameId/init', express.json(), (req, res) => {
     const gameId = req.params.gameId;
     const settings = req.body.settings;
     const players = req.body.players;
-    // console.log(gameId)
-    // console.log(players);
-    // console.log(settings)
     try{
-
         games.set(gameId, new Boum(gameId, settings.bombDuration, settings.lifePerPlayer, players, false));
         res.status(200).json({
             success: true,
@@ -63,22 +57,13 @@ app.post('/:gameId/init', express.json(), (req, res) => {
             message: e.message
         });
     }
-
-    // console.log(games.get(gameId));
-    // console.log("score : ", games.get(gameId).scores);
-
-
 });
 
 app.get('/:gameId/:token', express.json(), (req, res) => {
     const gameId = req.params.gameId;
     const token = req.params.token;
 
-    console.log("app.get / gameId : ", gameId);
-    console.log("app.get / token : ", token);
-    console.log("games : ", games.get(gameId));
     if(games.has(gameId)){
-        console.log("game found")
         let playerFound = false;
         let playerUuid = '';
         games.get(gameId)._scores.forEach((playerData, playerName) => {
@@ -88,7 +73,6 @@ app.get('/:gameId/:token', express.json(), (req, res) => {
             }
         });
         if (playerFound) {
-            console.log("player found")
             res.sendFile(path.join(__dirname, '../public', 'game.html'));
         }
         else {
@@ -101,20 +85,13 @@ app.get('/:gameId/:token', express.json(), (req, res) => {
             message: "Game not found"
         })
     }
-
 });
 
-
-
 io.on('connection', (socket) => {
-
     console.log('Un utilisateur s\'est connecté');
     const gameId = socket.handshake.query.gameId;
     const token = socket.handshake.query.token;
 
-
-    console.log("gameId: ", gameId)
-    console.log("token : ", token);
     if(!games.has(gameId)){
         console.log("game not found")
         return;
@@ -131,7 +108,6 @@ io.on('connection', (socket) => {
             currentGame._scores.get(playerName).connected = true;
         }
     });
-    // console.log("SCORE : ", currentGame._scores)
 
     socket.join(gameId);
     socket.username = pseudonyme;
@@ -154,37 +130,31 @@ io.on('connection', (socket) => {
     // Gérer les propositions de mots
     socket.on('proposition', (proposition) => {
         console.log('Proposition reçue:', proposition);
-        io.to(gameId).emit('word', proposition);
+
         currentGame._actualPlayer.actualWord = proposition;
+        let validWord = false;
         // Vérifier si le mot est valide
-        if (isValidWord(proposition, currentGame._currentSequence, currentGame._usedWords)) {
+        if (currentGame.isValidWord(proposition, currentGame._currentSequence, currentGame._usedWords)) {
             console.log('Mot valide !');
 
             // Ajouter le mot à la liste des mots utilisés
             currentGame._usedWords.push(proposition);
-
+            currentGame._timeLeft += 5;
             // Ajouter le mot au joueur actif
             // currentGame._scores.get(currentGame._actualPlayer.username).words.push(proposition);
-
-
-
+            validWord = true;
             // Changer de joueur
             currentGame.switchPlayer(io, gameId);
         } else {
             console.log('Mot invalide !');
         }
+        io.to(gameId).emit('word', [proposition, validWord]);
     })
-
-
-
-
 
     socket.on('message', (msg) => {
         console.log('Message reçu:', msg);
         io.emit('message', [msg, socket.id]); // Envoie le message à tous les clients
     });
-
-    // Rejoindre la room de cette partie
 
     // Gérer la déconnexion
     socket.on('disconnect', () => {
@@ -201,11 +171,7 @@ io.on('connection', (socket) => {
         // NE PAS CHANGER DE JOUEUR ACTIF
         console.log("Le joueur reste actif même après sa déconnexion.");
     });
-
-
-
 });
-
 
 // Fonction pour tirer un joueur au hasard
 function tirageAuHasardJoueur(map) {
@@ -221,24 +187,6 @@ function tirageAuHasardJoueur(map) {
     // Retourner la valeur (l'objet joueur)
     return map.get(joueurChoisi);
 }
-
-
-
-// Vérifie si un mot contient la séquence et est valide
-function isValidWord(word, sequence, usedWords) {
-    word = word.toLowerCase().trim();
-    // Vérifier si le mot contient la séquence
-    if (!word.includes(sequence.toLowerCase())) return false;
-    // Vérifier si le mot est dans le dictionnaire
-    if (!dictionary.includes(word)) return false;
-    // Vérifier si le mot a déjà été utilisé
-    if (usedWords.includes(word)) return false;
-    return true;
-}
-
-
-
-
 
 
 

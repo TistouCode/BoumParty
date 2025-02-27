@@ -11,17 +11,13 @@ const socket = io(
     }
 );
 
-
 let divPlayer = document.getElementById('divPlayer');
 let userList = document.getElementById('userList');
-
 let tabUsers = []
 
 socket.on('game-start', () => {
     console.log('La partie commence !');
 });
-
-
 
 let inputProposition = document.getElementById('inputProposition');
 inputProposition.addEventListener('keydown', function(event) {
@@ -32,14 +28,20 @@ inputProposition.addEventListener('keydown', function(event) {
     }
 });
 
-
+// Signal reçu lorsqu'un mot est validé
 socket.on('word', (word) => {
     console.log('Mot reçu :', word);
     let playerElement = document.getElementById(token);
-    playerElement.children[1].textContent = word;
+    if(word[1]===true){ // Si le mot est correct
+        playerElement.children[1].textContent = word[0];
+        playerElement.children[1].classList.add("text-green-500")
+    }else{ // Si le mot est incorrect
+        playerElement.children[1].textContent = word[0];
+        playerElement.children[1].classList.add("text-red-500")
+    }
+
+
 })
-
-
 socket.on('user-list', (players) => {
     console.log("Liste des joueurs mise à jour :", players);
 

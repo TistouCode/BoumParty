@@ -10,7 +10,7 @@ class Boum {
         this._intervalRunning = false; // Vérifie si le timer tourne
         this._currentSequence = null; // Séquence actuelle
         this._usedWords = []; // Mots déjà utilisés
-
+        this._timeLeft = 0; // Temps restant pour le joueur actuel
         // Initialisation des joueurs
         players.forEach(player => this.addPlayer(player));
     }
@@ -84,12 +84,14 @@ class Boum {
     startTimer(io, gameId) {
         if (!this._intervalRunning) {
             this._intervalRunning = true;
-            let chrono = this._bombDuration;
+            this._timeLeft = this._bombDuration;
             this._interval = setInterval(() => {
 
-                chrono--;
-                io.to(gameId).emit('timer', chrono);
-                if(chrono <= 0){
+                this._timeLeft--;
+
+                // CHRONO
+                io.to(gameId).emit('timer', this._timeLeft);
+                if(this._timeLeft <= 0){
                     console.log("BOUM")
                     this._actualPlayer.life--;
                     if(this._actualPlayer.life <= 0){
@@ -103,15 +105,14 @@ class Boum {
                     io.to(gameId).emit('boum', this._actualPlayer);
                     this.switchPlayer(io, gameId);
 
-                    chrono = this._bombDuration;
+                    this._timeLeft = this._bombDuration;
                     this._currentSequence = this.generateSequence();
                     io.to(gameId).emit('sequence', this._currentSequence);
-
                 }
-
             }, 1000);
-
         }
+
+
     }
 
     /**
@@ -119,6 +120,8 @@ class Boum {
      */
     switchPlayer(io, gameId) {
         this.drawActualPlayer();
+        this._currentSequence = this.generateSequence();
+        io.to(gameId).emit('sequence', this._currentSequence);
         io.to(gameId).emit('actual-player', this._actualPlayer.token);
     }
 
@@ -161,6 +164,17 @@ class Boum {
         // Choisir une stratégie aléatoire
         const strategy = strategies[Math.floor(Math.random() * strategies.length)];
         return strategy();
+    }
+
+    isValidWord(word, sequence, usedWords) {
+        word = word.toLowerCase().trim();
+        // Vérifier si le mot contient la séquence
+        if (!word.includes(sequence.toLowerCase())) return false;
+        // Vérifier si le mot est dans le dictionnaire
+        // if (!dictionary.includes(word)) return false;
+        // Vérifier si le mot a déjà été utilisé
+        if (usedWords.includes(word)) return false;
+        return true;
     }
 
 }
