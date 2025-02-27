@@ -139,27 +139,43 @@ io.on('connection', (socket) => {
 
     io.to(gameId).emit('user-list', Array.from(currentGame._scores));
 
-
-
-
-
-    // Lancement de la partie
-    if(currentGame._inGame === false){
-        currentGame._inGame = true;
-        console.log("DEBUT DE LA PARTIE")
-        currentGame._actualPlayer = tirageAuHasardJoueur(currentGame._scores);
-        currentGame._actualPlayer.play = true;
-        console.log("actualPlayer : ",  currentGame._actualPlayer);
-        io.to(gameId).emit('game-start');
-        io.to(gameId).emit('actual-player',  currentGame._actualPlayer.token);
-        console.log("TOKEN : ",  currentGame._actualPlayer.token)
-
-    }else{
-        console.log("PARTIE EN COURS")
-        io.to(gameId).emit('actual-player',  currentGame._actualPlayer.token);
-        console.log("TOKEN : ",  currentGame._actualPlayer.token)
+    // Envoyer immédiatement l'état du joueur actuel au nouvel utilisateur
+    if (currentGame._actualPlayer) {
+        socket.emit('actual-player', currentGame._actualPlayer.token);
     }
 
+    // Lancer la partie uniquement si elle n'est pas en cours
+    currentGame.startGame(io, gameId);
+
+    // Envoyer l'état actuel au nouvel arrivant
+    socket.emit('actual-player', currentGame._actualPlayer.token);
+
+
+
+
+    // // Lancement de la partie
+    // if(!currentGame._inGame){
+    //
+    //
+    //     currentGame._inGame = true;
+    //     console.log("DEBUT DE LA PARTIE")
+    //     currentGame.drawActualPlayer();
+    //     currentGame._actualPlayer.play = true;
+    //     console.log("actualPlayer : ",  currentGame._actualPlayer);
+    //     io.to(gameId).emit('game-start');
+    //     io.to(gameId).emit('actual-player',  currentGame._actualPlayer.token);
+    //     console.log("TOKEN : ",  currentGame._actualPlayer.token)
+    //
+    // }
+    // // Éviter plusieurs setInterval
+    // if (!currentGame.intervalRunning) {
+    //     currentGame.intervalRunning = true;
+    //     currentGame.interval = setInterval(() => {
+    //         currentGame.drawActualPlayer();
+    //         io.to(gameId).emit('actual-player', currentGame._actualPlayer.token);
+    //     }, 3000);
+    // }
+    //
 
     let sequence = generateSequence();
 
@@ -167,13 +183,6 @@ io.on('connection', (socket) => {
     // games.get(gameId)._scores.forEach((playerData, playerName) => {
     //
     // }
-
-
-
-
-
-
-
 
 
 

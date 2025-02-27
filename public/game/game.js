@@ -1,30 +1,17 @@
-
-/**
- * @brief Classe Quiz
- * @details Classe permettant de gérer une partie de quiz
- */
 class Boum {
-
-    /**
-     * @brief Constructeur de la classe Boum
-     * @param id Identifiant de la partie
-     * @param nbRounds Nombre de manches
-     * @param duration Durée d'une manche
-     * @param players Liste des joueurs
-     */
-    constructor(id, bombDuration = 6, lifePerPlayer = 3, players = [], inGame) {
-        this._id = id;                          // Identifiant de la partie
+    constructor(id, bombDuration = 2, lifePerPlayer = 3, players = [], inGame = false) {
+        this._id = id;
         this._scores = new Map();
-        this._timerDuration = bombDuration;
+        this._bombDuration = bombDuration;
         this._lifePerPlayer = lifePerPlayer;
         this._inGame = inGame; // Indique si la partie est en cours
         this._actualPlayer = null; // Joueur actuel
+        this._interval = null; // Stocke le setInterval
+        this._intervalRunning = false; // Vérifie si le timer tourne
+
         // Initialisation des joueurs
         players.forEach(player => this.addPlayer(player));
     }
-
-
-
 
     get scores() {
         return this._scores;
@@ -40,13 +27,75 @@ class Boum {
      */
     addPlayer(player) {
         this._scores.set(player.username, {
-            uuid: player.uuid,      // Identifiant unique du joueur
-            token: player.token,    // Token unique pour identifier le joueur dans la partie
-            score: 0,               // Score du joueur
-            life: this._lifePerPlayer, // Nombre de vies rest
-            play: false,          // Indique si le joueur a déjà joué
-            connected: false        // Indique si le joueur est connecté
+            uuid: player.uuid,
+            token: player.token,
+            score: 0,
+            life: this._lifePerPlayer,
+            play: false,
+            connected: false
         });
     }
+
+    /**
+     * @brief Tire un joueur au hasard
+     */
+    drawActualPlayer() {
+        let players = Array.from(this._scores.values());
+        let actualPlayer = players[Math.floor(Math.random() * players.length)];
+        this._actualPlayer = actualPlayer;
+        return actualPlayer;
+    }
+
+    /**
+     * @brief Démarre la partie si elle n'est pas déjà en cours
+     */
+    startGame(io, gameId) {
+        if (!this._inGame) {
+            this._inGame = true;
+            console.log("DÉBUT DE LA PARTIE");
+
+            this.drawActualPlayer();
+            this._actualPlayer.play = true;
+            io.to(gameId).emit('game-start');
+            io.to(gameId).emit('actual-player', this._actualPlayer.token);
+
+            this.startTimer(io, gameId);
+        } else {
+            console.log("PARTIE DÉJÀ EN COURS");
+        }
+    }
+
+    /**
+     * @brief Démarre le timer pour changer de joueur
+     */
+    startTimer(io, gameId) {
+        if (!this._intervalRunning) {
+            this._intervalRunning = true;
+            this._interval = setInterval(() => {
+                this.switchPlayer(io, gameId);
+            }, this._bombDuration*1000);
+        }
+    }
+
+    /**
+     * @brief Change de joueur et informe les clients
+     */
+    switchPlayer(io, gameId) {
+        this.drawActualPlayer();
+        io.to(gameId).emit('actual-player', this._actualPlayer.token);
+    }
+
+    /**
+     * @brief Arrête le jeu et le timer
+     */
+    stopGame() {
+        if (this._interval) {
+            clearInterval(this._interval);
+            this._interval = null;
+            this._intervalRunning = false;
+        }
+        this._inGame = false;
+    }
 }
+
 module.exports = Boum;

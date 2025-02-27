@@ -27,6 +27,7 @@ socket.on('user-list', (players) => {
                 console.log(tabUsers)
 
                 let liNewPlayer = document.createElement('li')
+                liNewPlayer.classList.add('player')
                 liNewPlayer.id = player[1].token;
                 liNewPlayer.textContent = player[0];
                 userList.appendChild(liNewPlayer);
@@ -61,9 +62,19 @@ inputProposition.addEventListener('keydown', function(event) {
 });
 
 socket.on('actual-player', (playerToken) => {
-    console.log("TOKEN", token)
+    console.log("Actual Player Token:", playerToken);
+    // Réinitialiser la couleur de tous les joueurs
+    document.querySelectorAll('.player').forEach(player => {
+        player.style.color = "black";
+    });
+    let actualPlayer = document.getElementById(playerToken);
+    if (actualPlayer) {
+        actualPlayer.style.color = "red";
+    }
+
     if(playerToken === token) {
         inputProposition.disabled = false;
+        actualPlayer.style.color = "red";
     }else{
         inputProposition.disabled = true;
     }
