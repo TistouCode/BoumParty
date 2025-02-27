@@ -142,14 +142,15 @@ io.on('connection', (socket) => {
     // Envoyer immédiatement l'état du joueur actuel au nouvel utilisateur
     if (currentGame._actualPlayer) {
         socket.emit('actual-player', currentGame._actualPlayer.token);
+        socket.emit('sequence', currentGame._currentSequence);
     }
 
     // Lancer la partie uniquement si elle n'est pas en cours
     currentGame.startGame(io, gameId);
 
     // Envoyer l'état actuel au nouvel arrivant
-    socket.emit('actual-player', currentGame._actualPlayer.token);
-
+    // socket.emit('actual-player', currentGame._actualPlayer.token);
+    //
 
 
 
@@ -177,7 +178,6 @@ io.on('connection', (socket) => {
     // }
     //
 
-    let sequence = generateSequence();
 
     // Envoie la séquence de lettres à tous les clients
     // games.get(gameId)._scores.forEach((playerData, playerName) => {
@@ -195,16 +195,21 @@ io.on('connection', (socket) => {
 
     // Rejoindre la room de cette partie
 
+    // Gérer la déconnexion
     socket.on('disconnect', () => {
-        console.log('Un utilisateur s\'est déconnecté');
-        currentGame._scores.forEach((playerData, playerName) => {
-            if (playerData.token === token) {
-                currentGame._scores.get(playerName).connected = false;
-            }
-        });
-        io.to(gameId).emit('user-list', Array.from(currentGame._scores));
-    });
+        console.log(`${pseudonyme} s'est déconnecté`);
 
+        // Marquer le joueur comme déconnecté
+        if (currentGame._scores.has(pseudonyme)) {
+            currentGame._scores.get(pseudonyme).connected = false;
+        }
+
+        // Informer les autres joueurs
+        io.to(gameId).emit('user-list', Array.from(currentGame._scores));
+
+        // NE PAS CHANGER DE JOUEUR ACTIF
+        console.log("Le joueur reste actif même après sa déconnexion.");
+    });
 
 
 
@@ -226,35 +231,7 @@ function tirageAuHasardJoueur(map) {
     return map.get(joueurChoisi);
 }
 
-// Génère une séquence de lettres aléatoire (2-3 lettres)
-function generateSequence() {
-    const vowels = 'aeiouy';
-    const consonants = 'bcdfghjklmnpqrstvwxz';
 
-    // Différentes stratégies pour générer des séquences jouables
-    const strategies = [
-        // Consonne + Voyelle
-        () => {
-            return consonants.charAt(Math.floor(Math.random() * consonants.length)) +
-                vowels.charAt(Math.floor(Math.random() * vowels.length));
-        },
-        // Voyelle + Consonne
-        () => {
-            return vowels.charAt(Math.floor(Math.random() * vowels.length)) +
-                consonants.charAt(Math.floor(Math.random() * consonants.length));
-        },
-        // Consonne + Voyelle + Consonne
-        () => {
-            return consonants.charAt(Math.floor(Math.random() * consonants.length)) +
-                vowels.charAt(Math.floor(Math.random() * vowels.length)) +
-                consonants.charAt(Math.floor(Math.random() * consonants.length));
-        }
-    ];
-
-    // Choisir une stratégie aléatoire
-    const strategy = strategies[Math.floor(Math.random() * strategies.length)];
-    return strategy();
-}
 
 // Vérifie si un mot contient la séquence et est valide
 function isValidWord(word, sequence, usedWords) {

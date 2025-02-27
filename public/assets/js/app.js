@@ -13,39 +13,10 @@ const socket = io(
 
 console.log("HHHHHH")
 
-let tabPlayer = document.getElementById('tabPlayer');
+let divPlayer = document.getElementById('divPlayer');
 let userList = document.getElementById('userList');
 
 let tabUsers = []
-socket.on('user-list', (players) => {
-    // console.log('Vous avez rejoint la partie en tant que :', pseudo);
-    console.log(players)
-    players.forEach((player) => {
-        if(player[1].connected === true && !tabUsers.includes(player[0])) {
-                tabUsers.push(player[0])
-                console.log(player[0] + " est connecté")
-                console.log(tabUsers)
-
-                let liNewPlayer = document.createElement('li')
-                liNewPlayer.classList.add('player')
-                liNewPlayer.id = player[1].token;
-                liNewPlayer.textContent = player[0];
-                userList.appendChild(liNewPlayer);
-        }
-        if(player[1].connected === false && tabUsers.includes(player[0])) {
-            console.log("Le joueur " + player[0] + " s'est déconnecté")
-            let liNewPlayer = document.getElementById(player[1].token);
-            console.log(liNewPlayer)
-            tabUsers = tabUsers.filter(e => e !== player[0])
-            liNewPlayer.remove();
-            // if(liNewPlayer !== null && tabUsers.includes(player[0])) {
-            //     tabUsers.remove(player[0])
-            //     liNewPlayer.remove();
-            // }
-
-        }
-    });
-});
 
 socket.on('game-start', () => {
     console.log('La partie commence !');
@@ -61,23 +32,65 @@ inputProposition.addEventListener('keydown', function(event) {
     }
 });
 
-socket.on('actual-player', (playerToken) => {
-    console.log("Actual Player Token:", playerToken);
-    // Réinitialiser la couleur de tous les joueurs
-    document.querySelectorAll('.player').forEach(player => {
-        player.style.color = "black";
-    });
-    let actualPlayer = document.getElementById(playerToken);
-    if (actualPlayer) {
-        actualPlayer.style.color = "red";
-    }
+socket.on('user-list', (players) => {
+    console.log("Liste des joueurs mise à jour :", players);
 
+    let playerListElement = document.getElementById("userList");
+    playerListElement.innerHTML = ""; // On vide la liste avant de la recharger
+
+    players.forEach(player => {
+        let li = document.createElement("li");
+        li.textContent = player[0]; // Nom du joueur
+        li.id = player[1].token;    // On met le token en id pour identifier chaque joueur
+        li.classList.add("player", "p-2", "rounded-lg");
+
+        // Si le joueur est actif, il reste rouge
+        if (player[1].token === currentActualPlayerToken) {
+            li.classList.add("text-red-500", "font-bold");
+        }
+
+        // Si le joueur est déconnecté, on le rend transparent
+        if (!player[1].connected) {
+            li.classList.add("opacity-70");
+        }
+
+        playerListElement.appendChild(li);
+    });
+});
+
+// Stocker le joueur actif
+let currentActualPlayerToken = null;
+socket.on('actual-player', (playerToken) => {
+    console.log("TOKEN reçu :", playerToken);
+    currentActualPlayerToken = playerToken;
+    updateActualPlayer(playerToken);
+});
+
+function updateActualPlayer(playerToken) {
+    let players = document.querySelectorAll('.player');
+
+    players.forEach(player => {
+        player.classList.remove("text-red-500", "font-bold");
+    });
+
+    let actualPlayer = document.getElementById(playerToken);
     if(playerToken === token) {
         inputProposition.disabled = false;
-        actualPlayer.style.color = "red";
     }else{
         inputProposition.disabled = true;
     }
+    if (actualPlayer) {
+
+        actualPlayer.classList.add("text-red-500", "font-bold");
+    }
+}
+
+
+let sequence = document.getElementById('sequence');
+
+socket.on('sequence', (seq) => {
+    console.log("Séquence reçue :", seq);
+    sequence.textContent = seq;
 })
 
 //
