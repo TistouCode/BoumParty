@@ -146,6 +146,8 @@ io.on('connection', (socket) => {
 
 
 
+
+
     socket.on('message', (msg) => {
         console.log('Message reçu:', msg);
         io.emit('message', [msg, socket.id]); // Envoie le message à tous les clients
