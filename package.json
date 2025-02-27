@@ -5,7 +5,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "build": "npx @tailwindcss/cli -i ./src/input.css -o ./src/output.css --watch"
   },
   "keywords": [],
   "author": "TistouCode",

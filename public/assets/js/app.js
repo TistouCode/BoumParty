@@ -13,8 +13,31 @@ const socket = io(
 
 console.log("HHHHHH")
 
-socket.on('join', (pseudo) => {
-    console.log('Vous avez rejoint la partie en tant que :', pseudo);
+let tabPlayer = document.getElementById('tabPlayer');
+let userList = document.getElementById('userList');
+socket.on('user-list', (players) => {
+    // console.log('Vous avez rejoint la partie en tant que :', pseudo);
+    console.log(players)
+    players.forEach((player) => {
+        if(player[1].connected === true){
+                console.log(player[0] + " est connecté")
+                let liNewPlayer = document.createElement('li')
+                liNewPlayer.textContent = player[0];
+                userList.appendChild(liNewPlayer);
+        }
+    });
+
+
+
+    // players.forEach((player) => {
+    //     let liNewPlayer = document.createElement('li')
+    //     liNewPlayer.textContent = player;
+    //     tabPlayer.appendChild(liNewPlayer);
+    // })
+    // let liNewPlayer = document.createElement('li')
+    // liNewPlayer.textContent = pseudo;
+    // tabPlayer.appendChild(liNewPlayer);
+
 });
 //
 // socket.on('message', (msg) => {

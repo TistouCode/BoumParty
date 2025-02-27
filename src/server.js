@@ -138,6 +138,11 @@ io.on('connection', (socket) => {
     socket.username = pseudonyme;
     socket.emit('join', pseudonyme);
 
+    io.to(gameId).emit('user-list', Array.from(currentGame._scores));
+
+
+
+
 
 
 
