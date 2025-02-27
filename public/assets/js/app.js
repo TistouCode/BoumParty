@@ -60,9 +60,12 @@ inputProposition.addEventListener('keydown', function(event) {
     }
 });
 
-socket.on('actual-player', (token) => {
-    if(token === token) {
+socket.on('actual-player', (playerToken) => {
+    console.log("TOKEN", token)
+    if(playerToken === token) {
         inputProposition.disabled = false;
+    }else{
+        inputProposition.disabled = true;
     }
 })
 

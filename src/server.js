@@ -52,7 +52,7 @@ app.post('/:gameId/init', express.json(), (req, res) => {
     // console.log(settings)
     try{
 
-        games.set(gameId, new Boum(gameId, settings.bombDuration, settings.lifePerPlayer, players));
+        games.set(gameId, new Boum(gameId, settings.bombDuration, settings.lifePerPlayer, players, false));
         res.status(200).json({
             success: true,
             message: "Game created"
@@ -139,10 +139,25 @@ io.on('connection', (socket) => {
 
     io.to(gameId).emit('user-list', Array.from(currentGame._scores));
 
+
+
+
+
     // Lancement de la partie
     if(currentGame._inGame === false){
-        io.to(gameId).emit('game-start');
         currentGame._inGame = true;
+        console.log("DEBUT DE LA PARTIE")
+        currentGame._actualPlayer = tirageAuHasardJoueur(currentGame._scores);
+        currentGame._actualPlayer.play = true;
+        console.log("actualPlayer : ",  currentGame._actualPlayer);
+        io.to(gameId).emit('game-start');
+        io.to(gameId).emit('actual-player',  currentGame._actualPlayer.token);
+        console.log("TOKEN : ",  currentGame._actualPlayer.token)
+
+    }else{
+        console.log("PARTIE EN COURS")
+        io.to(gameId).emit('actual-player',  currentGame._actualPlayer.token);
+        console.log("TOKEN : ",  currentGame._actualPlayer.token)
     }
 
 
@@ -153,11 +168,7 @@ io.on('connection', (socket) => {
     //
     // }
 
-    let firstPlayerToPlay = tirageAuHasardJoueur(currentGame._scores);
-    firstPlayerToPlay.play = true;
-    console.log("firstPlayerToPlay : ", firstPlayerToPlay);
 
-    io.to(gameId).emit('actual-player', firstPlayerToPlay.token);
 
 
 
