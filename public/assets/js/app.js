@@ -15,30 +15,57 @@ console.log("HHHHHH")
 
 let tabPlayer = document.getElementById('tabPlayer');
 let userList = document.getElementById('userList');
+
+let tabUsers = []
 socket.on('user-list', (players) => {
     // console.log('Vous avez rejoint la partie en tant que :', pseudo);
     console.log(players)
     players.forEach((player) => {
-        if(player[1].connected === true){
+        if(player[1].connected === true && !tabUsers.includes(player[0])) {
+                tabUsers.push(player[0])
                 console.log(player[0] + " est connecté")
+                console.log(tabUsers)
+
                 let liNewPlayer = document.createElement('li')
+                liNewPlayer.id = player[1].token;
                 liNewPlayer.textContent = player[0];
                 userList.appendChild(liNewPlayer);
         }
+        if(player[1].connected === false && tabUsers.includes(player[0])) {
+            console.log("Le joueur " + player[0] + " s'est déconnecté")
+            let liNewPlayer = document.getElementById(player[1].token);
+            console.log(liNewPlayer)
+            tabUsers = tabUsers.filter(e => e !== player[0])
+            liNewPlayer.remove();
+            // if(liNewPlayer !== null && tabUsers.includes(player[0])) {
+            //     tabUsers.remove(player[0])
+            //     liNewPlayer.remove();
+            // }
+
+        }
     });
-
-
-
-    // players.forEach((player) => {
-    //     let liNewPlayer = document.createElement('li')
-    //     liNewPlayer.textContent = player;
-    //     tabPlayer.appendChild(liNewPlayer);
-    // })
-    // let liNewPlayer = document.createElement('li')
-    // liNewPlayer.textContent = pseudo;
-    // tabPlayer.appendChild(liNewPlayer);
-
 });
+
+socket.on('game-start', () => {
+    console.log('La partie commence !');
+});
+
+
+let inputProposition = document.getElementById('inputProposition');
+inputProposition.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+        alert('Vous avez appuyé sur Entrée !');
+        let proposition = inputProposition.value;
+        socket.emit('proposition', proposition);
+    }
+});
+
+socket.on('actual-player', (token) => {
+    if(token === token) {
+        inputProposition.disabled = false;
+    }
+})
+
 //
 // socket.on('message', (msg) => {
 //     const li = document.createElement('li');

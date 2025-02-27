@@ -1,7 +1,7 @@
 {
     "settings": {
         "lifePerPlayer": 3,
-        "timerDuration": 10
+        "bombDuration": 10
     },
     "players": [
         {

@@ -52,7 +52,7 @@ app.post('/:gameId/init', express.json(), (req, res) => {
     // console.log(settings)
     try{
 
-        games.set(gameId, new Boum(gameId, settings.timerDuration, settings.lifePerPlayer, players));
+        games.set(gameId, new Boum(gameId, settings.bombDuration, settings.lifePerPlayer, players));
         res.status(200).json({
             success: true,
             message: "Game created"
@@ -82,7 +82,6 @@ app.get('/:gameId/:token', express.json(), (req, res) => {
         let playerFound = false;
         let playerUuid = '';
         games.get(gameId)._scores.forEach((playerData, playerName) => {
-            console.log("playerData : ", playerData)
             if (playerData.token === token) {
                 playerFound = true;
                 playerUuid = token;
@@ -132,13 +131,34 @@ io.on('connection', (socket) => {
             currentGame._scores.get(playerName).connected = true;
         }
     });
-    console.log("SCORE : ", currentGame._scores)
+    // console.log("SCORE : ", currentGame._scores)
 
     socket.join(gameId);
     socket.username = pseudonyme;
     socket.emit('join', pseudonyme);
 
     io.to(gameId).emit('user-list', Array.from(currentGame._scores));
+
+    // Lancement de la partie
+    if(currentGame._inGame === false){
+        io.to(gameId).emit('game-start');
+        currentGame._inGame = true;
+    }
+
+
+    let sequence = generateSequence();
+
+    // Envoie la séquence de lettres à tous les clients
+    // games.get(gameId)._scores.forEach((playerData, playerName) => {
+    //
+    // }
+
+    let firstPlayerToPlay = tirageAuHasardJoueur(currentGame._scores);
+    firstPlayerToPlay.play = true;
+    console.log("firstPlayerToPlay : ", firstPlayerToPlay);
+
+    io.to(gameId).emit('actual-player', firstPlayerToPlay.token);
+
 
 
 
@@ -157,12 +177,34 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         console.log('Un utilisateur s\'est déconnecté');
+        currentGame._scores.forEach((playerData, playerName) => {
+            if (playerData.token === token) {
+                currentGame._scores.get(playerName).connected = false;
+            }
+        });
+        io.to(gameId).emit('user-list', Array.from(currentGame._scores));
     });
+
+
 
 
 });
 
 
+// Fonction pour tirer un joueur au hasard
+function tirageAuHasardJoueur(map) {
+    // Convertir la Map en tableau de clés
+    const joueursCles = Array.from(map.keys());
+
+    // Choisir un index aléatoire
+    const indexHasard = Math.floor(Math.random() * joueursCles.length);
+
+    // Obtenir la clé du joueur choisi
+    const joueurChoisi = joueursCles[indexHasard];
+
+    // Retourner la valeur (l'objet joueur)
+    return map.get(joueurChoisi);
+}
 
 // Génère une séquence de lettres aléatoire (2-3 lettres)
 function generateSequence() {

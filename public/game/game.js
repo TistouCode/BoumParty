@@ -12,11 +12,12 @@ class Boum {
      * @param duration Durée d'une manche
      * @param players Liste des joueurs
      */
-    constructor(id, timerDuration = 6, lifePerPlayer = 3, players = []) {
+    constructor(id, bombDuration = 6, lifePerPlayer = 3, players = []) {
         this._id = id;                          // Identifiant de la partie
         this._scores = new Map();
-        this._timerDuration = timerDuration;
+        this._timerDuration = bombDuration;
         this._lifePerPlayer = lifePerPlayer;
+        this._inGame = false;                   // Indique si la partie est en cours
         // Initialisation des joueurs
         players.forEach(player => this.addPlayer(player));
     }
@@ -41,6 +42,8 @@ class Boum {
             uuid: player.uuid,      // Identifiant unique du joueur
             token: player.token,    // Token unique pour identifier le joueur dans la partie
             score: 0,               // Score du joueur
+            life: this._lifePerPlayer, // Nombre de vies rest
+            play: false,          // Indique si le joueur a déjà joué
             connected: false        // Indique si le joueur est connecté
         });
     }
