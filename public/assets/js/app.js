@@ -80,14 +80,12 @@ socket.on('user-list', (players) => {
     });
 });
 
-socket.on('boum', (player)=>{
-    console.log(player)
 
+// Signal reçu lorsqu'un joueur a perdu une vie
+socket.on('boum', (player)=>{
     let playerElement = document.getElementById(player.token);
     console.log("PLAYER ELEMENT", playerElement)
     playerElement.lastElementChild.lastElementChild.remove()
-
-
 })
 
 
