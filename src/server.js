@@ -24,12 +24,17 @@ app.use(express.urlencoded({ extended: true })); // Pour traiter les formulaires
 app.use(express.json()); // Pour traiter le JSON (si besoin)
 
 
+
 // Configuration pour servir les fichiers statiques
-app.use(express.static(path.join('public')));
+app.use(express.static(path.join(__dirname, '../public')));
+
+// Si vous avez besoin d'accéder spécifiquement au dossier src pour output.css
+app.use('/src', express.static(path.join(__dirname, '../src')));
+
 
 // Route principale
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public', 'game.html'));
+    res.sendFile(path.join(__dirname, '../public', 'index.html'));
 });
 
 // Route pour la page de jeu
@@ -69,7 +74,7 @@ app.get('/:gameId/:token', express.json(), (req, res) => {
     const gameId = req.params.gameId;
     const token = req.params.token;
 
-    console.log("app.get / gameId : ", typeof(gameId) );
+    console.log("app.get / gameId : ", gameId);
     console.log("app.get / token : ", token);
     console.log("games : ", games.get(gameId));
     if(games.has(gameId)){
@@ -77,7 +82,7 @@ app.get('/:gameId/:token', express.json(), (req, res) => {
         let playerFound = false;
         let playerUuid = '';
         games.get(gameId)._scores.forEach((playerData, playerName) => {
-            // console.log(playerData)
+            console.log("playerData : ", playerData)
             if (playerData.token === token) {
                 playerFound = true;
                 playerUuid = token;
@@ -91,6 +96,11 @@ app.get('/:gameId/:token', express.json(), (req, res) => {
             // Rediriger vers une page 403 si le token n'est pas trouvé
             res.redirect('/403');
         }
+    }else{
+        res.status(404).json({
+            success: false,
+            message: "Game not found"
+        })
     }
 
 });
@@ -100,14 +110,17 @@ app.get('/:gameId/:token', express.json(), (req, res) => {
 io.on('connection', (socket) => {
 
     console.log('Un utilisateur s\'est connecté');
-    const token = socket.handshake.query.token;
     const gameId = socket.handshake.query.gameId;
-    console.log("token : ", token);
+    const token = socket.handshake.query.token;
+
+
     console.log("gameId: ", gameId)
+    console.log("token : ", token);
     if(!games.has(gameId)){
         console.log("game not found")
         return;
     }
+
 
     let currentGame = games.get(gameId);
     let pseudonyme = '';
@@ -121,10 +134,19 @@ io.on('connection', (socket) => {
     });
     console.log("SCORE : ", currentGame._scores)
 
+    socket.join(gameId);
+    socket.username = pseudonyme;
+    socket.emit('join', pseudonyme);
+
+
+
+
     socket.on('message', (msg) => {
         console.log('Message reçu:', msg);
         io.emit('message', [msg, socket.id]); // Envoie le message à tous les clients
     });
+
+    // Rejoindre la room de cette partie
 
     socket.on('disconnect', () => {
         console.log('Un utilisateur s\'est déconnecté');
