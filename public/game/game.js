@@ -59,6 +59,14 @@ class Boum {
         }
     }
 
+    switchPlayer(io, gameId) {
+        this.drawActualPlayer();
+        this._currentSequence = this.generateSequence();
+        io.to(gameId).emit('sequence', this._currentSequence);
+        io.to(gameId).emit('actual-player', this._actualPlayer.token);
+    }
+
+
     /**
      * @brief Démarre la partie si elle n'est pas déjà en cours
      */
@@ -97,13 +105,11 @@ class Boum {
                     if(this._actualPlayer.life <= 0){
                         console.log("LE JOUEUR EST MORT : ", this._actualPlayer);
                         // Supprimer le joueur de _scores par son username
-
                         this._actualPlayer.live = false;
                         io.to(gameId).emit('player-death', this._actualPlayer);
                     }
                     io.to(gameId).emit('boum', this._actualPlayer);
                     this.switchPlayer(io, gameId);
-
                     this._timeLeft = this._bombDuration;
                     this._currentSequence = this.generateSequence();
                     io.to(gameId).emit('sequence', this._currentSequence);
@@ -117,12 +123,6 @@ class Boum {
     /**
      * @brief Change de joueur et informe les clients
      */
-    switchPlayer(io, gameId) {
-        this.drawActualPlayer();
-        this._currentSequence = this.generateSequence();
-        io.to(gameId).emit('sequence', this._currentSequence);
-        io.to(gameId).emit('actual-player', this._actualPlayer.token);
-    }
 
     /**
      * @brief Arrête le jeu et le timer

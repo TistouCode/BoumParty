@@ -40,10 +40,12 @@ socket.on('word', (word) => {
     if(validWord===true){ // Si le mot est correct
         console.log("MOT VALIDE")
         playerPropositionElement.textContent = proposition;
+        playerPropositionElement.classList.remove("text-red-500")
         playerPropositionElement.classList.add("text-green-500")
     }else if(validWord === false){ // Si le mot est incorrect
         console.log("MOT INVALIDE")
         playerPropositionElement.textContent = proposition;
+        playerPropositionElement.classList.remove("text-red-500")
         playerPropositionElement.classList.add("text-red-500")
     }
 })
@@ -54,9 +56,13 @@ socket.on('user-list', (players) => {
 
     players.forEach(player => {
         let playerElt = document.createElement("li");
-        playerElt.textContent = player[0]; // Nom du joueur
         playerElt.id = player[1].token;    // On met le token en id pour identifier chaque joueur
         playerElt.classList.add("player", "p-2", "rounded-lg");
+
+        let playerName = document.createElement("span");
+        playerName.id = `${player[1].token}-name`;
+        playerName.textContent = player[0];
+
 
         // Affichage des vies sous forme de cœurs
         let heartList = document.createElement("ul");
@@ -74,12 +80,13 @@ socket.on('user-list', (players) => {
         let proposition = document.createElement("p");
         proposition.id = `${player[1].token}-proposition`;
         // Ajouter la liste des cœurs à chaque joueur
+        playerElt.appendChild(playerName);
         playerElt.appendChild(heartList);
         playerElt.appendChild(proposition);
 
         // Si le joueur est actif, il reste rouge
         if (player[1].token === currentActualPlayerToken) {
-            playerElt.classList.add("text-red-500", "font-bold");
+            playerName.classList.add("text-red-500", "font-bold");
         }
 
         // Si le joueur est déconnecté, on le rend transparent
@@ -96,8 +103,15 @@ socket.on('user-list', (players) => {
 socket.on('boum', (player)=>{
     let playerElement = document.getElementById(player.token);
     console.log("PLAYER ELEMENT", playerElement.children)
-    playerElement.children[0].lastElementChild.remove()
-    playerElement.children[1].textContent = player.actualWord
+    let heartList = document.getElementById(`${player.token}-lives`);
+    let propositionPlayer = document.getElementById(`${player.token}-proposition`);
+    let playerName = document.getElementById(`${player.token}-name`);
+    heartList.lastElementChild.remove();
+    playerName.classList.remove("text-red-500", "font-bold");
+
+    propositionPlayer.textContent = player.actualWord;
+    // playerElement.children[0].lastElementChild.remove()
+    // playerElement.children[1].textContent = player.actualWord
 })
 
 
@@ -111,11 +125,11 @@ socket.on('actual-player', (playerToken) => {
 
 function updateActualPlayer(playerToken) {
     let players = document.querySelectorAll('.player');
-
+    let playerName = document.getElementById(`${playerToken}-name`);
     players.forEach(player => {
-        player.classList.remove("text-red-500", "font-bold");
+        // On enlève le style rouge et gras à tous les joueurs
+        document.getElementById(`${player.id}-name`).classList.remove("text-red-500", "font-bold");
     });
-
     let actualPlayer = document.getElementById(playerToken);
     if(playerToken === token) {
         inputProposition.disabled = false;
@@ -123,8 +137,7 @@ function updateActualPlayer(playerToken) {
         inputProposition.disabled = true;
     }
     if (actualPlayer) {
-
-        actualPlayer.classList.add("text-red-500", "font-bold");
+        playerName.classList.add("text-red-500", "font-bold");
     }
 }
 

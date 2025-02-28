@@ -149,14 +149,14 @@ io.on('connection', (socket) => {
         } else {
             console.log('Mot invalide !');
         }
-        console.log("JE RENVOIE A l'USER : ", [proposition, validWord, playerWhoWriteTheProposition])
+        console.log("JE RENVOIE A l'USER : ", [proposition, validWord, playerWhoWriteTheProposition.token])
         io.to(gameId).emit('word', [proposition, validWord, playerWhoWriteTheProposition.token]);
     })
 
-    socket.on('message', (msg) => {
-        console.log('Message reçu:', msg);
-        io.emit('message', [msg, socket.id]); // Envoie le message à tous les clients
-    });
+    // socket.on('message', (msg) => {
+    //     console.log('Message reçu:', msg);
+    //     io.emit('message', [msg, socket.id]); // Envoie le message à tous les clients
+    // });
 
     // Gérer la déconnexion
     socket.on('disconnect', () => {
