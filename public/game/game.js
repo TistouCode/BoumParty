@@ -169,7 +169,9 @@ class Boum {
     isValidWord(word, sequence, usedWords) {
         word = word.toLowerCase().trim();
         // Vérifier si le mot contient la séquence
-        if (!word.includes(sequence.toLowerCase())) return false;
+        if(sequence){
+            if (!word.includes(sequence.toLowerCase())) return false;
+        }
         // Vérifier si le mot est dans le dictionnaire
         // if (!dictionary.includes(word)) return false;
         // Vérifier si le mot a déjà été utilisé

@@ -181,9 +181,6 @@
   .top-90 {
     top: calc(var(--spacing) * 90);
   }
-  .top-96 {
-    top: calc(var(--spacing) * 96);
-  }
   .bottom-0 {
     bottom: calc(var(--spacing) * 0);
   }

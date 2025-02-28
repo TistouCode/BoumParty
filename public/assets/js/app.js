@@ -31,34 +31,37 @@ inputProposition.addEventListener('keydown', function(event) {
 // Signal reçu lorsqu'un mot est validé
 socket.on('word', (word) => {
     console.log('Mot reçu :', word);
-    let playerElement = document.getElementById(token);
-    if(word[1]===true){ // Si le mot est correct
-        playerElement.children[1].textContent = word[0];
-        playerElement.children[1].classList.add("text-green-500")
+    let proposition = word[0];
+    let validWord = word[1];
+    let playerToken = word[2];
+    let playerElementWhoWriteTheProposition = document.getElementById(playerToken);
+    if(validWord===true){ // Si le mot est correct
+        console.log("MOT VALIDE")
+        playerElementWhoWriteTheProposition.children[1].textContent = proposition;
+        playerElementWhoWriteTheProposition.children[1].classList.add("text-green-500")
     }else{ // Si le mot est incorrect
-        playerElement.children[1].textContent = word[0];
-        playerElement.children[1].classList.add("text-red-500")
+        console.log("MOT INVALIDE")
+        playerElementWhoWriteTheProposition.children[1].textContent = proposition;
+        playerElementWhoWriteTheProposition.children[1].classList.add("text-red-500")
     }
 
 
 })
-socket.on('user-list', (players) => {
-    console.log("Liste des joueurs mise à jour :", players);
 
+socket.on('user-list', (players) => {
     let playerListElement = document.getElementById("userList");
     playerListElement.innerHTML = ""; // On vide la liste avant de la recharger
 
     players.forEach(player => {
-        let li = document.createElement("li");
-        li.textContent = player[0]; // Nom du joueur
-        li.id = player[1].token;    // On met le token en id pour identifier chaque joueur
-        li.classList.add("player", "p-2", "rounded-lg");
-        console.log(player)
+        let playerElt = document.createElement("li");
+        playerElt.textContent = player[0]; // Nom du joueur
+        playerElt.id = player[1].token;    // On met le token en id pour identifier chaque joueur
+        playerElt.classList.add("player", "p-2", "rounded-lg");
 
         // Affichage des vies sous forme de cœurs
         let heartList = document.createElement("ul");
         heartList.classList.add("flex", "space-x-1"); // On ajoute de l'espace entre les cœurs
-
+        heartList.id = `${player[1].token}-lives`;
         // Afficher 3 cœurs, certains vides si le joueur a perdu des vies
         let lives = player[1].life;
         for (let i = 0; i < lives; i++) {
@@ -66,25 +69,25 @@ socket.on('user-list', (players) => {
             heart.textContent = i < lives ? "❤️" : "🤍"; // Cœur plein si la vie est encore là, sinon cœur vide
             heart.classList.add("text-xl"); // Agrandir les cœurs
             heartList.appendChild(heart);
-            console.log("LIVES : ", lives)
         }
 
         let proposition = document.createElement("p");
+        proposition.id = `${player[1].token}-proposition`;
         // Ajouter la liste des cœurs à chaque joueur
-        li.appendChild(heartList);
-        li.appendChild(proposition);
+        playerElt.appendChild(heartList);
+        playerElt.appendChild(proposition);
 
         // Si le joueur est actif, il reste rouge
         if (player[1].token === currentActualPlayerToken) {
-            li.classList.add("text-red-500", "font-bold");
+            playerElt.classList.add("text-red-500", "font-bold");
         }
 
         // Si le joueur est déconnecté, on le rend transparent
         if (!player[1].connected) {
-            li.classList.add("opacity-70");
+            playerElt.classList.add("opacity-70");
         }
 
-        playerListElement.appendChild(li);
+        playerListElement.appendChild(playerElt);
     });
 });
 

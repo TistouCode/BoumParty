@@ -148,7 +148,7 @@ io.on('connection', (socket) => {
         } else {
             console.log('Mot invalide !');
         }
-        io.to(gameId).emit('word', [proposition, validWord]);
+        io.to(gameId).emit('word', [proposition, validWord, currentGame._actualPlayer.token]);
     })
 
     socket.on('message', (msg) => {
