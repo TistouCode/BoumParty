@@ -107,6 +107,16 @@ class Boum {
                         // Supprimer le joueur de _scores par son username
                         this._actualPlayer.live = false;
                         io.to(gameId).emit('player-death', this._actualPlayer);
+
+                        // Vérifie s'il ne reste qu'un seul joueur en vie
+                        let alivePlayers = Array.from(this._scores.values()).filter(player => player.live === true);
+                        if (alivePlayers.length === 1) {
+                            console.log("FIN DE LA PARTIE");
+                            io.to(gameId).emit('game-over', alivePlayers[0]); // Envoie le gagnant
+                            io.to(gameId).emit('boum', this._actualPlayer);
+                            this.stopGame();
+                            return; // Stoppe l'exécution du timer
+                        }
                     }
                     io.to(gameId).emit('boum', this._actualPlayer);
                     this.switchPlayer(io, gameId);

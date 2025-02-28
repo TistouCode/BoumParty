@@ -161,3 +161,9 @@ socket.on('player-death', (player) => {
     playerElement.classList.add("opacity-20");
 })
 
+socket.on('game-over', (winner) => {
+    console.log("Partie terminée ! Le gagnant est :", winner);
+    let winnerElement = document.getElementById(winner.token);
+    winnerElement.classList.add("text-green-500", "font-bold");
+    inputProposition.disabled = true;
+});
