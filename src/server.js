@@ -26,14 +26,10 @@ app.use(express.json()); // Pour traiter le JSON (si besoin)
 // Configuration pour servir les fichiers statiques
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Si vous avez besoin d'accéder spécifiquement au dossier src pour output.css
 app.use('/src', express.static(path.join(__dirname, '../src')));
 
 
-// Route principale
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public', 'index.html'));
-});
+
 
 // Route pour la page de jeu
 const games = new Map();
@@ -119,6 +115,7 @@ io.on('connection', (socket) => {
     if (currentGame._actualPlayer) {
         socket.emit('actual-player', currentGame._actualPlayer.token);
         socket.emit('sequence', currentGame._currentSequence);
+        socket.emit('timer', currentGame._timeLeft);
         socket.emit('word', currentGame._actualPlayer.actualWord);
         // socket.emit('timer', currentGame._bombDuration);
     }
