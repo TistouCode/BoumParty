@@ -14,7 +14,7 @@
     </h1>
 
     <div id="divPlayer" class="w-full flex justify-center items-center flex-col p-4  h-full bg-lavender-blush-3">
-
+        <div id="bomb" class="text-3xl bg-gray-800 text-white rounded-full w-16 h-16 flex justify-center items-center font-bold shadow-lg absolute z-10">💣</div>
         <h3 id="sequence" class="text-3xl p-4 border border-black rounded-lg"></h3>
 
         <ul id="userList" class="flex flex-row space-x-8 border border-gray-400 rounded-lg p-4 ">
@@ -23,10 +23,10 @@
         <h2 id="timer" class="text-3xl"></h2>
     </div>
 
-
-
     <input type="text" id="inputProposition" class="p-2 border border-gray-400 rounded-lg"
            placeholder="Tapez quelque chose..." disabled>
+
+
 
 </div>
 <script src="/socket.io/socket.io.js"></script>

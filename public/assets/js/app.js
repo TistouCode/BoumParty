@@ -167,3 +167,5 @@ socket.on('game-over', (winner) => {
     winnerElement.classList.add("text-green-500", "font-bold");
     inputProposition.disabled = true;
 });
+
+
