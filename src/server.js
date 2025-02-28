@@ -132,6 +132,7 @@ io.on('connection', (socket) => {
         console.log('Proposition reçue:', proposition);
 
         currentGame._actualPlayer.actualWord = proposition;
+        let playerWhoWriteTheProposition = currentGame._actualPlayer;
         let validWord = false;
         // Vérifier si le mot est valide
         if (currentGame.isValidWord(proposition, currentGame._currentSequence, currentGame._usedWords)) {
@@ -139,7 +140,7 @@ io.on('connection', (socket) => {
 
             // Ajouter le mot à la liste des mots utilisés
             currentGame._usedWords.push(proposition);
-            currentGame._timeLeft += 5;
+            currentGame._timeLeft += 2;
             // Ajouter le mot au joueur actif
             // currentGame._scores.get(currentGame._actualPlayer.username).words.push(proposition);
             validWord = true;
@@ -148,7 +149,8 @@ io.on('connection', (socket) => {
         } else {
             console.log('Mot invalide !');
         }
-        io.to(gameId).emit('word', [proposition, validWord, currentGame._actualPlayer.token]);
+        console.log("JE RENVOIE A l'USER : ", [proposition, validWord, playerWhoWriteTheProposition])
+        io.to(gameId).emit('word', [proposition, validWord, playerWhoWriteTheProposition.token]);
     })
 
     socket.on('message', (msg) => {

@@ -67,7 +67,7 @@ class Boum {
             this._inGame = true;
             console.log("DÉBUT DE LA PARTIE");
 
-            this.drawActualPlayer();
+            this.switchPlayer(io, gameId);
             this._actualPlayer.play = true;
             io.to(gameId).emit('game-start');
             io.to(gameId).emit('actual-player', this._actualPlayer.token);
@@ -96,9 +96,8 @@ class Boum {
                     this._actualPlayer.life--;
                     if(this._actualPlayer.life <= 0){
                         console.log("LE JOUEUR EST MORT : ", this._actualPlayer);
-                        console.log("SCORES : ", this._scores);
                         // Supprimer le joueur de _scores par son username
-                        console.log(this._actualPlayer)
+
                         this._actualPlayer.live = false;
                         io.to(gameId).emit('player-death', this._actualPlayer);
                     }

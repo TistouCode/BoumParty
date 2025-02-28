@@ -34,18 +34,18 @@ socket.on('word', (word) => {
     let proposition = word[0];
     let validWord = word[1];
     let playerToken = word[2];
-    let playerElementWhoWriteTheProposition = document.getElementById(playerToken);
+    console.log("PLAYER WHO WRITE IS : ", playerToken)
+    let playerElementWhoWriteTheProposition = document.getElementById(token);
+    let playerPropositionElement = document.getElementById(`${playerToken}-proposition`);
     if(validWord===true){ // Si le mot est correct
         console.log("MOT VALIDE")
-        playerElementWhoWriteTheProposition.children[1].textContent = proposition;
-        playerElementWhoWriteTheProposition.children[1].classList.add("text-green-500")
-    }else{ // Si le mot est incorrect
+        playerPropositionElement.textContent = proposition;
+        playerPropositionElement.classList.add("text-green-500")
+    }else if(validWord === false){ // Si le mot est incorrect
         console.log("MOT INVALIDE")
-        playerElementWhoWriteTheProposition.children[1].textContent = proposition;
-        playerElementWhoWriteTheProposition.children[1].classList.add("text-red-500")
+        playerPropositionElement.textContent = proposition;
+        playerPropositionElement.classList.add("text-red-500")
     }
-
-
 })
 
 socket.on('user-list', (players) => {
