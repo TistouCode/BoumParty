@@ -1,3 +1,4 @@
+// Fichier game.js
 class Boum {
     constructor(id, bombDuration = 5, lifePerPlayer = 3, players = [], inGame = false) {
         this._id = id;
@@ -99,7 +100,7 @@ class Boum {
 
                 // CHRONO
                 io.to(gameId).emit('timer', this._timeLeft);
-                if(this._timeLeft <= 0){
+                if(this._timeLeft === 0){
                     console.log("BOUM")
                     this._actualPlayer.life--;
                     if(this._actualPlayer.life <= 0){

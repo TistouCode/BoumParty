@@ -3,36 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Socket.IO Chat</title>
+    <title>BoumParty - Socket.IO Chat</title>
     <link rel="stylesheet" href="/assets/css/builded.css">
+    <style>
+        :root {
+            /* Couleurs principales */
+            --primary: #6C63FF;        /* Violet vif */
+            --primary-dark: #4B45B3;   /* Violet foncé */
+            --primary-light: #9690FF;  /* Violet clair */
+
+            /* Couleur d'accentuation */
+            --accent: #FF5E7D;         /* Rose vibrant */
+            --accent-dark: #D13960;    /* Rose foncé */
+            --accent-light: #FF8EA4;   /* Rose clair */
+
+            /* Couleurs neutres */
+            --dark: #1A1A2E;           /* Bleu très foncé */
+            --dark-mid: #242439;       /* Bleu foncé intermédiaire */
+            --dark-light: #30304D;     /* Bleu foncé plus clair */
+
+            /* Couleurs texte */
+            --text-primary: #F0F0F8;   /* Blanc légèrement bleuté */
+            --text-secondary: #BCBCD0; /* Gris clair bleuté */
+            --text-muted: #7575A3;     /* Bleu grisé */
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .bomb-animation {
+            animation: pulsate 1.5s infinite;
+        }
+
+        @keyframes pulsate {
+            0% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 94, 125, 0.7); }
+            50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(255, 94, 125, 0.9); }
+            100% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 94, 125, 0.7); }
+        }
+
+        .player-card {
+            transition: all 0.3s ease;
+        }
+
+        .player-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .timer-pulse {
+            animation: timerGlow 2s infinite alternate;
+        }
+
+        @keyframes timerGlow {
+            from { box-shadow: 0 0 5px rgba(255, 94, 125, 0.5); }
+            to { box-shadow: 0 0 15px rgba(255, 94, 125, 0.8); }
+        }
+
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background-color: rgba(48, 48, 77, 0.5);
+            border: 1px solid rgba(108, 99, 255, 0.2);
+        }
+
+        /* Assure que l'input désactivé a tout de même un style élégant */
+        input:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Animation de couleur pour le joueur actif */
+        @keyframes activePlayerAnimation {
+            0% { background-color: var(--dark-light); }
+            25% { background-color: rgba(255, 94, 125, 0.3); }
+            50% { background-color: rgba(255, 94, 125, 0.5); }
+            75% { background-color: rgba(255, 94, 125, 0.3); }
+            100% { background-color: var(--dark-light); }
+        }
+
+        .active-player {
+            animation: activePlayerAnimation 1.5s infinite;
+            border: 2px solid var(--accent);
+        }
+    </style>
 </head>
-<body class="bg-lavender-blush-3 h-screen w-screen flex justify-center items-center">
-<div class="flex flex-col">
+<body style="background-color: var(--dark); color: var(--text-primary);" class="h-screen w-screen flex justify-center items-center">
 
-    <h1 class="text-3xl font-bold flex justify-center items-center text-red-900">
-        BoumParty
-    </h1>
+<div class="flex flex-col rounded-2xl w-4/5 md:w-3/5 lg:w-1/2 h-4/5 shadow-2xl overflow-hidden" style="background-color: var(--dark-mid); border: 1px solid var(--primary-dark);">
+    <div id="bomb" class="text-4xl rounded-full w-20 h-20 flex justify-center items-center font-bold bomb-animation absolute top-4 right-4 z-10" style="background-color: var(--accent);">💣</div>
 
-    <div id="divPlayer" class="w-full flex justify-center items-center flex-col p-4  h-full bg-lavender-blush-3">
-        <div id="bomb" class="text-3xl bg-gray-800 text-white rounded-full w-16 h-16 flex justify-center items-center font-bold shadow-lg absolute z-10">💣</div>
-        <h3 id="sequence" class="text-3xl p-4 border border-black rounded-lg"></h3>
+    <header class="p-5 flex justify-center items-center" style="background-color: var(--dark);">
+        <h1 class="text-4xl font-bold" style="color: var(--primary-light);">
+            <span class="mr-2">🎮</span> BoumParty <span class="ml-2">💣</span>
+        </h1>
+    </header>
 
-        <ul id="userList" class="flex flex-row space-x-8 border border-gray-400 rounded-lg p-4 ">
-            <!-- Tu peux ajouter autant de joueurs que tu veux -->
-        </ul>
-        <h2 id="timer" class="text-3xl"></h2>
+    <div id="divPlayer" class="w-full flex-1 flex justify-center items-center flex-col p-6 relative">
+
+        <div class="mb-8 w-full">
+            <p id="sequence" class="text-3xl p-6 rounded-2xl text-center font-medium glass-effect" style="color: var(--text-primary);"></p>
+        </div>
+
+        <h2 class="text-2xl font-semibold mb-4" style="color: var(--primary-light);">Joueurs</h2>
+
+        <div class="w-full mb-8">
+            <ul id="userList" class="flex flex-wrap justify-center gap-4 p-4">
+                <!-- Les joueurs seront ajoutés dynamiquement ici -->
+            </ul>
+        </div>
+
+        <h2 id="timer" class="text-4xl font-bold px-8 py-4 rounded-full timer-pulse" style="background-color: var(--dark); color: var(--accent); border: 2px solid var(--accent-dark);">00:30</h2>
     </div>
 
-    <input type="text" id="inputProposition" class="p-2 border border-gray-400 rounded-lg"
-           placeholder="Tapez quelque chose..." disabled>
-
-
+    <div class="p-5" style="background-color: var(--dark);">
+        <input type="text" id="inputProposition" class="w-full p-4 rounded-lg text-lg" style="background-color: var(--dark-light); color: var(--text-primary); border: 1px solid var(--primary-dark); outline: none;"
+               placeholder="Tapez quelque chose..." disabled>
+    </div>
 
 </div>
+
 <script src="/socket.io/socket.io.js"></script>
 <script src="/assets/js/app.js"></script>
-<script>
-
-</script>
 </body>
 </html>

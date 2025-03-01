@@ -1,4 +1,4 @@
-// server.js - Serveur principal pour le jeu Bomb Party
+// server.js - Serveur principal pour le jeu BoumParty
 const express = require('express');
 const fs = require('fs');
 const http = require('http');
