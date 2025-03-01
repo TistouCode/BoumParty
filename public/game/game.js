@@ -181,12 +181,35 @@ class Boum {
         if(sequence){
             if (!word.includes(sequence.toLowerCase())) return false;
         }
+
+        if(!this.verifierMot(word)) return false;
         // Vérifier si le mot est dans le dictionnaire
         // if (!dictionary.includes(word)) return false;
         // Vérifier si le mot a déjà été utilisé
         if (usedWords.includes(word)) return false;
         return true;
     }
+
+    async verifierMot(mot) {
+        const url = `https://fr.wiktionary.org/wiki/${encodeURIComponent(mot)}`;
+
+        try {
+            const response = await fetch(url, { method: 'HEAD' });
+            if (response.ok) {
+                console.log(`Le mot "${mot}" existe sur le Wiktionnaire. ${response}`);
+                return true;
+            } else {
+                console.log(`Le mot "${mot}" n'existe pas.`);
+                return false;
+            }
+        } catch (error) {
+            console.error("Erreur lors de la vérification :", error);
+            return false;
+        }
+    }
+
+
+
 
 }
 
