@@ -147,27 +147,25 @@ class Boum {
     }
 
     generateSequence() {
-        const vowels = 'aeiouy';
-        const consonants = 'bcdfghjklmnpqrstvwxz';
+        const commonVowels = 'aeiou';
+        const commonConsonants = 'bcdfghjklmnpqrst';
 
-        // Différentes stratégies pour générer des séquences jouables
+        // Bigrammes courants en français
+        const frequentBigrams = ['ou', 'on', 'ai', 'en', 'an', 'et', 'er', 'in'];
+
+        // Stratégies simplifiées
         const strategies = [
-            // Consonne + Voyelle
-            () => {
-                return consonants.charAt(Math.floor(Math.random() * consonants.length)) +
-                    vowels.charAt(Math.floor(Math.random() * vowels.length));
-            },
-            // Voyelle + Consonne
-            () => {
-                return vowels.charAt(Math.floor(Math.random() * vowels.length)) +
-                    consonants.charAt(Math.floor(Math.random() * consonants.length));
-            },
-            // Consonne + Voyelle + Consonne
-            () => {
-                return consonants.charAt(Math.floor(Math.random() * consonants.length)) +
-                    vowels.charAt(Math.floor(Math.random() * vowels.length)) +
-                    consonants.charAt(Math.floor(Math.random() * consonants.length));
-            }
+            // Utiliser un bigramme fréquent
+            () => frequentBigrams[Math.floor(Math.random() * frequentBigrams.length)],
+
+            // Consonne + Voyelle (fréquent)
+            () => commonConsonants.charAt(Math.floor(Math.random() * commonConsonants.length)) +
+                commonVowels.charAt(Math.floor(Math.random() * commonVowels.length)),
+
+            // Consonne + Voyelle + Consonne (mais avec des lettres courantes)
+            () => commonConsonants.charAt(Math.floor(Math.random() * commonConsonants.length)) +
+                commonVowels.charAt(Math.floor(Math.random() * commonVowels.length)) +
+                commonConsonants.charAt(Math.floor(Math.random() * commonConsonants.length))
         ];
 
         // Choisir une stratégie aléatoire
