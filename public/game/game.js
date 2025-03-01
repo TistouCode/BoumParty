@@ -121,7 +121,6 @@ class Boum {
                     io.to(gameId).emit('boum', this._actualPlayer);
                     this.switchPlayer(io, gameId);
                     this._timeLeft = this._bombDuration;
-                    this._currentSequence = this.generateSequence();
                     io.to(gameId).emit('sequence', this._currentSequence);
                 }
             }, 1000);
