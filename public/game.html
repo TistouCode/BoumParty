@@ -89,30 +89,30 @@
 </head>
 <body style="background-color: var(--dark); color: var(--text-primary);" class="h-screen w-screen flex justify-center items-center">
 
-<div class="flex flex-col rounded-2xl w-4/5 md:w-3/5 lg:w-1/2 h-4/5 shadow-2xl overflow-hidden" style="background-color: var(--dark-mid); border: 1px solid var(--primary-dark);">
+<div class="flex flex-col rounded-2xl w-4/5 md:w-3/5 lg:w-1/2 h-full m-5 shadow-2xl overflow-hidden" style="background-color: var(--dark-mid); border: 1px solid var(--primary-dark);">
     <div id="bomb" class="text-4xl rounded-full w-20 h-20 flex justify-center items-center font-bold bomb-animation absolute top-4 right-4 z-10" style="background-color: var(--accent);">💣</div>
 
-    <header class="p-5 flex justify-center items-center" style="background-color: var(--dark);">
+    <header class="p-2 flex justify-center items-center" style="background-color: var(--dark);">
         <h1 class="text-4xl font-bold" style="color: var(--primary-light);">
             <span class="mr-2">🎮</span> BoumParty <span class="ml-2">💣</span>
         </h1>
     </header>
 
-    <div id="divPlayer" class="w-full flex-1 flex justify-center items-center flex-col p-6 relative">
+    <div id="divPlayer" class="w-full flex-1 flex justify-center items-center flex-col p-3 relative">
 
         <div class="mb-8 w-full">
-            <p id="sequence" class="text-3xl p-6 rounded-2xl text-center font-medium glass-effect" style="color: var(--text-primary);"></p>
+            <p id="sequence" class="text-3xl p-3 rounded-2xl text-center font-medium glass-effect" style="color: var(--text-primary);"></p>
         </div>
 
-        <h2 class="text-2xl font-semibold mb-4" style="color: var(--primary-light);">Joueurs</h2>
+        <h2 class="text-2xl font-semibold mb-2" style="color: var(--primary-light);">Joueurs</h2>
 
-        <div class="w-full mb-8">
-            <ul id="userList" class="flex flex-wrap justify-center gap-4 p-4">
+        <div class="w-full mb-2">
+            <ul id="userList" class="flex flex-wrap justify-center gap-4 p-3">
                 <!-- Les joueurs seront ajoutés dynamiquement ici -->
             </ul>
         </div>
 
-        <h2 id="timer" class="text-4xl font-bold px-8 py-4 rounded-full timer-pulse" style="background-color: var(--dark); color: var(--accent); border: 2px solid var(--accent-dark);">00:30</h2>
+        <h2 id="timer" class="text-3xl font-bold px-4 py-2 rounded-full timer-pulse" style="background-color: var(--dark); color: var(--accent); border: 2px solid var(--accent-dark);">00:30</h2>
     </div>
 
     <div class="p-5" style="background-color: var(--dark);">
