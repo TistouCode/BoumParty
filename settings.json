@@ -1,0 +1,47 @@
+{
+  "game": {
+    "name": "BoomParty",
+    "version": "0.1",
+    "description": "Ecrivez plus vite que la bombe, sinon elle explose sur vous !",
+    "type": "single",
+    "author": "Mathis Rivrais"
+  },
+  "settings": {
+    "minPlayers": 2,
+    "maxPlayers": 20,
+    "allowChat": true,
+    "allowVoice": false,
+    "allowSpectators": true,
+    "allowJoinInProgress": false,
+    "allowLeaveInProgress": true,
+    "isNode": true,
+    "serverPort": null,
+    "serverAddress": null
+  },
+  "modifiableSettings": {
+    "lifePerPlayer": {
+      "name": "Nombres de vies par joueur",
+      "description": "Si le joueur n'a plus de vies alors il meurt",
+      "type": "number",
+      "default": 3,
+      "min": 3,
+      "max": 10
+    },
+    "bombDuration": {
+      "name": "Durée de la bombe avant l'explosion",
+      "description": "Si la bombe n'a plus de temps alors elle explose",
+      "type": "number",
+      "default": 5,
+      "min": 2,
+      "max": 30
+    }
+  },
+  "neededParametersFromComus": [
+    "MODIFIED_SETTING_DATA",
+    "PLAYER_UUID",
+    "PLAYER_NAME"
+  ],
+  "returnParametersToComus": [
+    "WINNER_UUID"
+  ]
+}
