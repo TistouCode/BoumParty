@@ -68,7 +68,7 @@ export class Boum {
         this.drawActualPlayer();
         this._currentSequence = this.generateSequence();
         io.to(gameId).emit('sequence', this._currentSequence);
-        io.to(gameId).emit('actual-player', this._actualPlayer.token);
+        io.to(gameId).emit('actual-player', this._actualPlayer.uuid);
     }
 
 
@@ -83,7 +83,7 @@ export class Boum {
             this.switchPlayer(io, gameId);
             this._actualPlayer.play = true;
             io.to(gameId).emit('game-start');
-            io.to(gameId).emit('actual-player', this._actualPlayer.token);
+            io.to(gameId).emit('actual-player', this._actualPlayer.uuid);
 
             this.startTimer(io, gameId);
         } else {
@@ -148,17 +148,25 @@ export class Boum {
             this._intervalRunning = false;
         }
         let alivePlayers = Array.from(this._scores.values()).filter(player => player.live === true);
-
-        let results = {
-        }
-        alivePlayers.forEach(player => {
+        console.log(alivePlayers)
+        let results = {}
+        let winner = alivePlayers[0]
+        let winnerUuid = winner.uuid;
+        let isWinner = false;
+        this._scores.forEach(player => {
+            if (player.uuid == winnerUuid) {
+                isWinner = true;
+            }else{
+                isWinner = false;
+            }
             results[player.uuid] = {
                 token: player.token,
+                winner : isWinner,
             }
         });
         console.log(results);
         this._inGame = false;
-        io.to(gameId).emit('game-over', results); // Envoie le gagnant
+        io.to(gameId).emit('game-over', winner); // Envoie le gagnant
         try {
             let request = new FormData();
             request.append('token', this._gameToken);
