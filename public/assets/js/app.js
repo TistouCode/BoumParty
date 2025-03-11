@@ -35,10 +35,10 @@ socket.on('word', (word) => {
     console.log('Mot reçu :', word);
     let proposition = word[0];
     let validWord = word[1];
-    let playerToken = word[2];
-    console.log("PLAYER WHO WRITE IS : ", playerToken)
-    let playerElementWhoWriteTheProposition = document.getElementById(token);
-    let playerPropositionElement = document.getElementById(`${playerToken}-proposition`);
+    let playerUuid = word[2];
+    console.log("PLAYER WHO WRITE IS : ", playerUuid)
+    let playerElementWhoWriteTheProposition = document.getElementById(playerUuid);
+    let playerPropositionElement = document.getElementById(`${playerUuid}-proposition`);
     if(validWord===true){ // Si le mot est correct
         console.log("MOT VALIDE")
         playerPropositionElement.textContent = proposition;
@@ -58,7 +58,7 @@ socket.on('user-list', (players) => {
 
     players.forEach(player => {
         let playerElt = document.createElement("li");
-        playerElt.id = player[1].token;    // On met le token en id pour identifier chaque joueur
+        playerElt.id = player[1].uuid;    // On met le uuid en id pour identifier chaque joueur
         playerElt.classList.add(
             "player",
             "player-card",
@@ -78,7 +78,7 @@ socket.on('user-list', (players) => {
         playerAvatar.textContent = player[0].charAt(0).toUpperCase(); // Première lettre du nom
 
         let playerName = document.createElement("span");
-        playerName.id = `${player[1].token}-name`;
+        playerName.id = `${player[1].uuid}-name`;
         playerName.textContent = player[0];
         playerName.classList.add(
             "font-medium"
@@ -88,7 +88,7 @@ socket.on('user-list', (players) => {
         // Affichage des vies sous forme de cœurs
         let heartList = document.createElement("ul");
         heartList.classList.add("flex", "space-x-1", "my-2"); // On ajoute de l'espace entre les cœurs
-        heartList.id = `${player[1].token}-lives`;
+        heartList.id = `${player[1].uuid}-lives`;
         // Afficher les cœurs en fonction des vies restantes
         let lives = player[1].life;
         for (let i = 0; i < lives; i++) {
@@ -99,7 +99,7 @@ socket.on('user-list', (players) => {
         }
 
         let proposition = document.createElement("p");
-        proposition.id = `${player[1].token}-proposition`;
+        proposition.id = `${player[1].uuid}-proposition`;
         proposition.classList.add("text-center", "mt-1", "text-sm", "w-full", "overflow-hidden", "text-ellipsis");
 
         // Ajouter tous les éléments à la carte du joueur
@@ -109,7 +109,7 @@ socket.on('user-list', (players) => {
         playerElt.appendChild(proposition);
 
         // Si le joueur est actif
-        if (player[1].token === currentActualPlayerToken) {
+        if (player[1].uuid === currentActualPlayerToken) {
             playerName.classList.add("text-red-500", "font-bold");
             playerElt.classList.add("active-player"); // Ajoute l'animation
         }
@@ -126,11 +126,11 @@ socket.on('user-list', (players) => {
 
 // Signal reçu lorsqu'un joueur a perdu une vie
 socket.on('boum', (player)=>{
-    let playerElement = document.getElementById(player.token);
+    let playerElement = document.getElementById(player.uuid);
     console.log("PLAYER ELEMENT", playerElement.children)
-    let heartList = document.getElementById(`${player.token}-lives`);
-    let propositionPlayer = document.getElementById(`${player.token}-proposition`);
-    let playerName = document.getElementById(`${player.token}-name`);
+    let heartList = document.getElementById(`${player.uuid}-lives`);
+    let propositionPlayer = document.getElementById(`${player.uuid}-proposition`);
+    let playerName = document.getElementById(`${player.uuid}-name`);
     heartList.lastElementChild.remove();
     playerName.classList.remove("text-red-500", "font-bold");
 
@@ -143,15 +143,15 @@ socket.on('boum', (player)=>{
 
 // Stocker le joueur actif
 let currentActualPlayerToken = null;
-socket.on('actual-player', (playerToken) => {
-    console.log("TOKEN reçu :", playerToken);
-    currentActualPlayerToken = playerToken;
-    updateActualPlayer(playerToken);
+socket.on('actual-player', (playerUuid) => {
+    console.log("UUID reçu :", playerUuid);
+    currentActualPlayerToken = playerUuid;
+    updateActualPlayer(playerUuid);
 });
 
-function updateActualPlayer(playerToken) {
+function updateActualPlayer(playerUuid) {
     let players = document.querySelectorAll('.player');
-    let playerName = document.getElementById(`${playerToken}-name`);
+    let playerName = document.getElementById(`${playerUuid}-name`);
 
     players.forEach(player => {
         // On enlève le style rouge et gras à tous les joueurs
@@ -160,9 +160,9 @@ function updateActualPlayer(playerToken) {
         player.classList.remove("active-player");
     });
 
-    let actualPlayer = document.getElementById(playerToken);
+    let actualPlayer = document.getElementById(playerUuid);
 
-    if(playerToken === token) {
+    if(playerUuid === token) {
         inputProposition.disabled = false;
     } else {
         inputProposition.disabled = true;
@@ -189,14 +189,14 @@ socket.on('timer', (time) => {
 
 socket.on('player-death', (player) => {
     console.log("Joueur mort :", player);
-    let playerElement = document.getElementById(player.token);
+    let playerElement = document.getElementById(player.uuid);
     playerElement.classList.add("opacity-20");
     playerElement.classList.remove("active-player"); // S'assurer que le joueur mort n'a pas l'animation
 })
 
 socket.on('game-over', (winner) => {
     console.log("Partie terminée ! Le gagnant est :", winner);
-    let winnerElement = document.getElementById(winner.token);
+    let winnerElement = document.getElementById(winner.uuid);
     winnerElement.classList.add("text-green-500", "font-bold");
     winnerElement.classList.remove("active-player"); // Retirer l'animation du gagnant
 
@@ -208,7 +208,7 @@ socket.on('game-over', (winner) => {
     let messageContent = document.createElement("div");
     messageContent.classList.add("text-4xl", "font-bold", "p-8", "rounded-xl", "text-center");
     messageContent.style.color = "var(--primary-light)";
-    messageContent.innerHTML = `🎉 ${document.getElementById(`${winner.token}-name`).textContent} a gagné ! 🎉`;
+    messageContent.innerHTML = `🎉 ${document.getElementById(`${winner.uuid}-name`).textContent} a gagné ! 🎉`;
 
     victoryMessage.appendChild(messageContent);
     document.getElementById("divPlayer").appendChild(victoryMessage);
