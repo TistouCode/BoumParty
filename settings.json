@@ -16,7 +16,8 @@
     "allowLeaveInProgress": true,
     "isNode": true,
     "serverPort": null,
-    "serverAddress": null
+    "serverAddress": null,
+    "serveByComus": true
   },
   "modifiableSettings": {
     "lifePerPlayer": {
@@ -42,6 +43,6 @@
     "PLAYER_NAME"
   ],
   "returnParametersToComus": [
-    "WINNER_UUID"
+    "WINNERS"
   ]
 }
