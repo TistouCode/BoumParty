@@ -2,6 +2,8 @@
 // server.js - Serveur principal pour le jeu BoumParty
 import express from 'express';
 import fs from 'fs';
+import config from '../config.json' with { type: 'json' };
+
 import http from 'http';
 import { Server as socketIo } from 'socket.io';
 import path from 'path';
@@ -188,7 +190,7 @@ function tirageAuHasardJoueur(map) {
 
 
 // Démarrage du serveur
-const PORT = process.env.PORT || 3000;
+const PORT = config.PORT;
 server.listen(PORT, () => {
     console.log(`Serveur Bomb Party démarré sur le port ${PORT}`);
 });
