@@ -1,26 +1,29 @@
 // server.js - Serveur principal pour le jeu BoumParty
-const express = require('express');
-const fs = require('fs');
-const http = require('http');
-const socketIo = require('socket.io');
-const path = require('path');
-const Boum = require('../public/game/game.js'); // Importer la classe Boum
+// server.js - Serveur principal pour le jeu BoumParty
+import express from 'express';
+import fs from 'fs';
+import http from 'http';
+import { Server as socketIo } from 'socket.io';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { Boum } from '../public/game/game.js'; // Importer la classe Boum
 
-const { fileURLToPath } = require('url'); // Pour obtenir le chemin du fichier
-const dirname = path.dirname; // Pour obtenir le répertoire du fichier
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Chargement du dictionnaire de mots français
 const dictionary = fs.readFileSync('dictionary-fr.txt', 'utf8').split('\n');
 
 const app = express(); // Créer une application Express
 const server = http.createServer(app); // Créer un serveur HTTP
-const io = socketIo(server); // Créer une instance de Socket.IO
-
-
+const io = new socketIo(server); // Créer une instance de Socket.IO
 
 app.use(express.urlencoded({ extended: true })); // Pour traiter les formulaires HTML
 app.use(express.json()); // Pour traiter le JSON (si besoin)
 
+// Configuration pour servir les fichiers statiques
+app.use(express.static(path.join(__dirname, '../public')));
+app.use('/src', express.static(path.join(__dirname, '../src')));
 
 
 // Configuration pour servir les fichiers statiques
@@ -41,8 +44,9 @@ app.post('/:gameId/init', express.json(), (req, res) => {
     const gameId = req.params.gameId;
     const settings = req.body.settings;
     const players = req.body.players;
+    const gameToken = req.body.token;
     try{
-        games.set(gameId, new Boum(gameId, settings.bombDuration, settings.lifePerPlayer, players, false));
+        games.set(gameId, new Boum(gameId, settings.bombDuration, settings.lifePerPlayer, players, false, gameToken));
         res.status(200).json({
             success: true,
             message: "Game created"
@@ -62,6 +66,7 @@ app.get('/:gameId/:token', express.json(), (req, res) => {
     if(games.has(gameId)){
         let playerFound = false;
         let playerUuid = '';
+
         games.get(gameId)._scores.forEach((playerData, playerName) => {
             if (playerData.token === token) {
                 playerFound = true;

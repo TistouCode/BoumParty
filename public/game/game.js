@@ -1,6 +1,9 @@
+import fs from 'fs';
+import config from '../../config.json' with { type: 'json' };
+
 // Fichier game.js
-class Boum {
-    constructor(id, bombDuration = 5, lifePerPlayer = 3, players = [], inGame = false) {
+export class Boum {
+    constructor(id, bombDuration = 5, lifePerPlayer = 3, players = [], inGame = false, gameToken) {
         this._id = id;
         this._scores = new Map();
         this._bombDuration = bombDuration;
@@ -12,6 +15,7 @@ class Boum {
         this._currentSequence = null; // Séquence actuelle
         this._usedWords = []; // Mots déjà utilisés
         this._timeLeft = 0; // Temps restant pour le joueur actuel
+        this._gameToken = gameToken; // Token de la partie
         // Initialisation des joueurs
         players.forEach(player => this.addPlayer(player));
     }
@@ -113,9 +117,9 @@ class Boum {
                         let alivePlayers = Array.from(this._scores.values()).filter(player => player.live === true);
                         if (alivePlayers.length === 1) {
                             console.log("FIN DE LA PARTIE");
-                            io.to(gameId).emit('game-over', alivePlayers[0]); // Envoie le gagnant
+
                             io.to(gameId).emit('boum', this._actualPlayer);
-                            this.stopGame();
+                            this.endGame(io, gameId);
                             return; // Stoppe l'exécution du timer
                         }
                     }
@@ -137,13 +141,52 @@ class Boum {
     /**
      * @brief Arrête le jeu et le timer
      */
-    stopGame() {
+    async endGame(io, gameId) {
         if (this._interval) {
             clearInterval(this._interval);
             this._interval = null;
             this._intervalRunning = false;
         }
+        let alivePlayers = Array.from(this._scores.values()).filter(player => player.live === true);
+
+        let results = {
+        }
+        alivePlayers.forEach(player => {
+            results[player.uuid] = {
+                token: player.token,
+            }
+        });
+        console.log(results);
         this._inGame = false;
+        io.to(gameId).emit('game-over', results); // Envoie le gagnant
+        try {
+            let request = new FormData();
+            request.append('token', this._gameToken);
+            request.append('results', JSON.stringify(results));
+
+            const response = await fetch(`${config.URL_COMUS}/game/${this._id}/end`, {
+                method: 'POST',
+                body: request
+            });
+
+            const responseText = await response.text();
+            let responseData;
+            try {
+                responseData = JSON.parse(responseText);
+            } catch (error) {
+                throw new Error(`Invalid JSON response: ${responseText}`);
+            }
+
+            if (!responseData.success) {
+                throw new Error(responseData.message);
+            }
+
+            console.log(`Résultat de la partie ${this._id} envoyé au serveur de Comus Party avec succès`);
+            return true;
+        } catch (error) {
+            console.error(`Erreur lors de l'envoi du résultat de la partie ${this._id} au serveur de Comus Party:`, error);
+            return false;
+        }
     }
 
     generateSequence() {
@@ -211,4 +254,3 @@ class Boum {
 
 }
 
-module.exports = Boum;
