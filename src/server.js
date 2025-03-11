@@ -11,9 +11,6 @@ import { Boum } from '../public/game/game.js'; // Importer la classe Boum
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Chargement du dictionnaire de mots français
-const dictionary = fs.readFileSync('dictionary-fr.txt', 'utf8').split('\n');
-
 const app = express(); // Créer une application Express
 const server = http.createServer(app); // Créer un serveur HTTP
 const io = new socketIo(server); // Créer une instance de Socket.IO
