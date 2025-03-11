@@ -109,7 +109,7 @@ socket.on('user-list', (players) => {
         playerElt.appendChild(proposition);
 
         // Si le joueur est actif
-        if (player[1].uuid === currentActualPlayerToken) {
+        if (player[1].uuid === currentActualPlayerUuid) {
             playerName.classList.add("text-red-500", "font-bold");
             playerElt.classList.add("active-player"); // Ajoute l'animation
         }
@@ -142,17 +142,18 @@ socket.on('boum', (player)=>{
 
 
 // Stocker le joueur actif
-let currentActualPlayerToken = null;
+let currentActualPlayerUuid = null;
 socket.on('actual-player', (playerUuid) => {
-    console.log("UUID reçu :", playerUuid);
-    currentActualPlayerToken = playerUuid;
+    // console.log("UUID reçu :", playerUuid);
+    // currentActualPlayerToken = playerData.token;:
     updateActualPlayer(playerUuid);
 });
-
+const currentUserUuid = token;
 function updateActualPlayer(playerUuid) {
     let players = document.querySelectorAll('.player');
     let playerName = document.getElementById(`${playerUuid}-name`);
-
+    console.log("TOKENJOEUUR", currentUserUuid)
+    console.log("PLAYERUUID", playerUuid)
     players.forEach(player => {
         // On enlève le style rouge et gras à tous les joueurs
         document.getElementById(`${player.id}-name`).classList.remove("text-red-500", "font-bold");
@@ -162,11 +163,11 @@ function updateActualPlayer(playerUuid) {
 
     let actualPlayer = document.getElementById(playerUuid);
 
-    if(playerUuid === token) {
-        inputProposition.disabled = false;
-    } else {
-        inputProposition.disabled = true;
-    }
+    // if (playerData.token === currentUserUuid) {
+    //     inputProposition.disabled = false;
+    // } else {
+    //     inputProposition.disabled = true;
+    // }
 
     if (actualPlayer) {
         playerName.classList.add("text-red-500", "font-bold");

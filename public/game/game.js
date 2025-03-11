@@ -68,7 +68,7 @@ export class Boum {
         this.drawActualPlayer();
         this._currentSequence = this.generateSequence();
         io.to(gameId).emit('sequence', this._currentSequence);
-        io.to(gameId).emit('actual-player', this._actualPlayer.uuid);
+        io.to(gameId).emit('actual-player', this._actualPlayer);
     }
 
 
@@ -83,7 +83,7 @@ export class Boum {
             this.switchPlayer(io, gameId);
             this._actualPlayer.play = true;
             io.to(gameId).emit('game-start');
-            io.to(gameId).emit('actual-player', this._actualPlayer.uuid);
+            io.to(gameId).emit('actual-player', this._actualPlayer);
 
             this.startTimer(io, gameId);
         } else {
