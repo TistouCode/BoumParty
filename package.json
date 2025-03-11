@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "watch": "tailwindcss build -i src/assets/css/base.css -o public/assets/css/builded.css --watch"
+    "watch": "tailwindcss build -i src/assets/css/base.css -o public/assets/css/builded.css --watch",
+    "build": "tailwindcss build -i src/assets/css/base.css -o public/assets/css/builded.css --minify"
   },
   "keywords": [],
   "author": "TistouCode",
