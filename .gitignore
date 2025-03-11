@@ -1,4 +1,3 @@
 node_modules/
 public/assets/css/builded.css
-config.json/
-settings.json/
+config.json
