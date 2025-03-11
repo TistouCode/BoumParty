@@ -163,7 +163,7 @@ function updateActualPlayer(playerUuid) {
 
     let actualPlayer = document.getElementById(playerUuid);
 
-    // if (playerData.token === currentUserUuid) {
+    // if (playerUuid === currentUserUuid) {
     //     inputProposition.disabled = false;
     // } else {
     //     inputProposition.disabled = true;
@@ -174,6 +174,22 @@ function updateActualPlayer(playerUuid) {
         actualPlayer.classList.add("active-player"); // Ajoute l'animation au joueur actif
     }
 }
+
+
+socket.on('you-are-current-player', (player) => {
+    console.log("Vous êtes le joueur actif !");
+    inputProposition.disabled = false;
+    inputProposition.focus();
+    console.log("YOU ARE CURRENT : ", player)
+    currentActualPlayerUuid = player.uuid;
+    updateActualPlayer(player.uuid);
+})
+
+socket.on('you-are-not-current-player', (player) => {
+    console.log("Vous êtes pas le joueur actif !");
+    inputProposition.value = '';
+    inputProposition.disabled = true;
+})
 
 
 let sequence = document.getElementById('sequence');

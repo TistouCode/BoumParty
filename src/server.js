@@ -107,6 +107,7 @@ io.on('connection', (socket) => {
         if (playerData.token === token) {
             pseudonyme = playerName;
             currentGame._scores.get(playerName).connected = true;
+            currentGame._scores.get(playerName).socketId = socket.id;
         }
     });
 

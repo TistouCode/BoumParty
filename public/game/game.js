@@ -16,6 +16,7 @@ export class Boum {
         this._usedWords = []; // Mots déjà utilisés
         this._timeLeft = 0; // Temps restant pour le joueur actuel
         this._gameToken = gameToken; // Token de la partie
+        this._currentPlayerSocketId = null;
         // Initialisation des joueurs
         players.forEach(player => this.addPlayer(player));
     }
@@ -68,7 +69,15 @@ export class Boum {
         this.drawActualPlayer();
         this._currentSequence = this.generateSequence();
         io.to(gameId).emit('sequence', this._currentSequence);
-        io.to(gameId).emit('actual-player', this._actualPlayer);
+
+        if(this._currentPlayerSocketId != null){
+            io.to(this._currentPlayerSocketId).emit('you-are-not-current-player', this._actualPlayer);
+        }
+        io.to(gameId).emit('actual-player', this._actualPlayer.uuid);
+
+        this._currentPlayerSocketId = this._actualPlayer.socketId
+        console.log("Joueur actuel :",  this._currentPlayerSocketId );
+        io.to(this._currentPlayerSocketId ).emit('you-are-current-player', this._actualPlayer);
     }
 
 
@@ -83,7 +92,7 @@ export class Boum {
             this.switchPlayer(io, gameId);
             this._actualPlayer.play = true;
             io.to(gameId).emit('game-start');
-            io.to(gameId).emit('actual-player', this._actualPlayer);
+            io.to(gameId).emit('actual-player', this._actualPlayer.uuid);
 
             this.startTimer(io, gameId);
         } else {
