@@ -44,11 +44,27 @@ app.post('/:gameId/init', express.json(), (req, res) => {
     const settings = req.body.settings;
     const players = req.body.players;
     const gameToken = req.body.token;
+
+
+    if (players.length > MAX_PLAYERS) {
+        res.status(409).json({
+            success: false,
+            message: 'Trop de joueurs pour la partie'
+        });
+        return;
+    }
+    if (players.length < MIN_PLAYERS) {
+        res.status(409).json({
+            success: false,
+            message: 'Pas assez de joueurs pour la partie'
+        });
+        return;
+    }
     try{
         games.set(gameId, new Boum(gameId, settings.bombDuration, settings.lifePerPlayer, players, false, gameToken));
         res.status(200).json({
             success: true,
-            message: "Game created"
+            message: "Partie initialisée avec succès"
         });
     }catch (e) {
         res.status(500).json({
@@ -57,6 +73,17 @@ app.post('/:gameId/init', express.json(), (req, res) => {
         });
     }
 });
+
+// Route d'erreur 404 (page introuvable)
+app.get('/404', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public', '404.html'));
+});
+
+// Route d'erreur 403 (accès interdit)
+app.get('/403', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public', '403.html'));
+});
+
 
 app.get('/:gameId/:token', express.json(), (req, res) => {
     const gameId = req.params.gameId;
