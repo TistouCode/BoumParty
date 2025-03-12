@@ -36,7 +36,9 @@ app.use('/src', express.static(path.join(__dirname, '../src')));
 // Route pour la page de jeu
 const games = new Map();
 
-
+// Constantes uniques pour l'ensemble des parties
+const MIN_PLAYERS = 1;
+const MAX_PLAYERS = 10;
 
 app.post('/:gameId/init', express.json(), (req, res) => {
 
