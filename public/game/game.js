@@ -249,20 +249,64 @@ export class Boum {
     }
 
     async verifierMot(mot) {
-        const url = `https://fr.wiktionary.org/wiki/${encodeURIComponent(mot)}`;
-
+        // const url = `https://fr.wiktionary.org/wiki/${encodeURIComponent(mot)}`;
+        //
+        // try {
+        //     const response = await fetch(url, { method: 'HEAD' });
+        //     if (response.ok) {
+        //         console.log(`Le mot "${mot}" existe sur le Wiktionnaire. ${response}`);
+        //         return true;
+        //     } else {
+        //         console.log(`Le mot "${mot}" n'existe pas.`);
+        //         return false;
+        //     }
+        // } catch (error) {
+        //     console.error("Erreur lors de la vérification :", error);
+        //     return false;
+        // }
+        console.log("HAHAHAHAHAHHAHAH")
         try {
-            const response = await fetch(url, { method: 'HEAD' });
-            if (response.ok) {
-                console.log(`Le mot "${mot}" existe sur le Wiktionnaire. ${response}`);
-                return true;
-            } else {
-                console.log(`Le mot "${mot}" n'existe pas.`);
-                return false;
+            // URL du dictionnaire de l'Académie française (page de recherche)
+            const url = "https://www.dictionnaire-academie.fr/search";
+
+            // Construction des données du formulaire
+            const formData = new FormData();
+            formData.append('term', mot);
+            formData.append('options', '1'); // 9e édition du dictionnaire
+
+            // Configuration de la requête POST
+            const options = {
+                method: 'POST',
+                headers: new Headers({
+                    'Accept': 'application/json',
+                }),
+                body: formData,
+                // Ne pas définir Content-Type pour FormData (le navigateur le fait automatiquement)
+            };
+
+            // Envoi de la requête
+            const response = await fetch(url, options);
+
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP: ${response.status} ${response.statusText}`);
             }
-        } catch (error) {
-            console.error("Erreur lors de la vérification :", error);
-            return false;
+
+            const result = (await response.json())['result'];
+            // Analyse de la réponse (peut être HTML ou JSON selon le site)
+            const contentType = response.headers.get('content-type');
+            let resultat;
+
+
+            if (contentType && contentType.includes('application/json')) {
+                // Si la réponse est JSON
+                resultat = await response.json();
+            }
+            console.log("Resultat : ", resultat)
+            return resultat;
+
+        } catch (erreur) {
+            console.error("Erreur lors de la requête:", erreur);
+            throw erreur;
         }
     }
 
