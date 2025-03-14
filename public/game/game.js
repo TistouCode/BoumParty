@@ -1,6 +1,8 @@
 import fs from 'fs';
 import config from '../../config.json' with {type: 'json'};
 
+
+let indexJoueur =  Math.floor(Math.random() * 1000) % 3;
 // Fichier game.js
 export class Boum {
     constructor(id, bombDuration = 5, lifePerPlayer = 3, players = [], inGame = false, gameToken) {
@@ -46,17 +48,23 @@ export class Boum {
         });
     }
 
+    defineFirstPlayer(){
+        let alivePlayers = Array.from(this._scores.values()).filter(player => player.live === true);
+        let indexJoueur =  Math.floor(Math.random() * 1000) % alivePlayers.length;
+        let firstPlayer = alivePlayers[indexJoueur];
+        this._actualPlayer = firstPlayer;
+    }
     /**
      * @brief Tire un joueur au hasard
      */
     drawActualPlayer() {
         // Filtrer les joueurs qui sont encore en vie
         let alivePlayers = Array.from(this._scores.values()).filter(player => player.live === true);
-
+        indexJoueur++;
         // Si il y a des joueurs vivants
         if (alivePlayers.length > 0) {
             // Tirer au hasard un joueur parmi les vivants
-            let actualPlayer = alivePlayers[Math.floor(Math.random() * alivePlayers.length)];
+            let actualPlayer = alivePlayers[indexJoueur%alivePlayers.length];
             this._actualPlayer = actualPlayer;
             return actualPlayer;
         } else {
@@ -104,6 +112,7 @@ export class Boum {
 
             if (preGameTimeLeft < 0) {
                 clearInterval(preGameInterval);
+                this.defineFirstPlayer()
                 this.switchPlayer(io, gameId);
                 this._actualPlayer.play = true;
                 io.to(gameId).emit('game-start');
