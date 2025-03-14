@@ -159,14 +159,17 @@ io.on('connection', (socket) => {
     // Envoyer le mot à tous les clients
 
     // Gérer les propositions de mots
-    socket.on('proposition', (proposition) => {
+    socket.on('proposition', async (proposition) => {
         console.log('Proposition reçue:', proposition);
 
         currentGame._actualPlayer.actualWord = proposition;
         let playerWhoWriteTheProposition = currentGame._actualPlayer;
         let validWord = false;
+        // console.log('papapapa : ', currentGame.isValidWord(proposition, currentGame._currentSequence, currentGame._usedWords))
         // Vérifier si le mot est valide
-        if (currentGame.isValidWord(proposition, currentGame._currentSequence, currentGame._usedWords)) {
+        let resProposition = await currentGame.isValidWord(proposition, currentGame._currentSequence, currentGame._usedWords);
+        console.log(resProposition);
+        if (resProposition) {
             console.log('Mot valide !');
 
             // Ajouter le mot à la liste des mots utilisés
@@ -176,12 +179,17 @@ io.on('connection', (socket) => {
             // currentGame._scores.get(currentGame._actualPlayer.username).words.push(proposition);
             validWord = true;
             // Changer de joueur
+            console.log("JE RENVOIE A l'USER : ", [proposition, validWord, playerWhoWriteTheProposition.uuid])
+            io.to(gameId).emit('word', [proposition, validWord, playerWhoWriteTheProposition.uuid]);
             currentGame.switchPlayer(io, gameId);
+
         } else {
             console.log('Mot invalide !');
+            validWord = false
+            console.log("JE RENVOIE A l'USER : ", [proposition, validWord, playerWhoWriteTheProposition.uuid])
+            io.to(gameId).emit('word', [proposition, validWord, playerWhoWriteTheProposition.uuid]);
         }
-        console.log("JE RENVOIE A l'USER : ", [proposition, validWord, playerWhoWriteTheProposition.uuid])
-        io.to(gameId).emit('word', [proposition, validWord, playerWhoWriteTheProposition.uuid]);
+
     })
 
     // Gérer la déconnexion

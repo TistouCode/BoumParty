@@ -1,5 +1,5 @@
 import fs from 'fs';
-import config from '../../config.json' with { type: 'json' };
+import config from '../../config.json' with {type: 'json'};
 
 // Fichier game.js
 export class Boum {
@@ -70,14 +70,14 @@ export class Boum {
         this._currentSequence = this.generateSequence();
         io.to(gameId).emit('sequence', this._currentSequence);
 
-        if(this._currentPlayerSocketId != null){
+        if (this._currentPlayerSocketId != null) {
             io.to(this._currentPlayerSocketId).emit('you-are-not-current-player', this._actualPlayer);
         }
         io.to(gameId).emit('actual-player', this._actualPlayer.uuid);
 
         this._currentPlayerSocketId = this._actualPlayer.socketId
-        console.log("Joueur actuel :",  this._currentPlayerSocketId );
-        io.to(this._currentPlayerSocketId ).emit('you-are-current-player', this._actualPlayer);
+        console.log("Joueur actuel :", this._currentPlayerSocketId);
+        io.to(this._currentPlayerSocketId).emit('you-are-current-player', this._actualPlayer);
     }
 
     /**
@@ -126,10 +126,10 @@ export class Boum {
 
                 // CHRONO
                 io.to(gameId).emit('timer', this._timeLeft);
-                if(this._timeLeft === 0){
+                if (this._timeLeft === 0) {
                     console.log("BOUM")
                     this._actualPlayer.life--;
-                    if(this._actualPlayer.life <= 0){
+                    if (this._actualPlayer.life <= 0) {
                         console.log("LE JOUEUR EST MORT : ", this._actualPlayer);
                         // Supprimer le joueur de _scores par son username
                         this._actualPlayer.live = false;
@@ -178,12 +178,12 @@ export class Boum {
         this._scores.forEach(player => {
             if (player.uuid == winnerUuid) {
                 isWinner = true;
-            }else{
+            } else {
                 isWinner = false;
             }
             results[player.uuid] = {
                 token: player.token,
-                winner : isWinner,
+                winner: isWinner,
             }
         });
         console.log(results);
@@ -246,95 +246,86 @@ export class Boum {
         return strategy();
     }
 
-    isValidWord(word, sequence, usedWords) {
+    async isValidWord(word, sequence, usedWords) {
         word = word.toLowerCase().trim();
         // Vérifier si le mot contient la séquence
-        if(sequence){
-            if (!word.includes(sequence.toLowerCase())) return false;
+        if (sequence) {
+            if (word.includes(sequence.toLowerCase()) === false) {
+                return false;
+            }
         }
 
-        if(!this.verifierMot(word)) return false;
-        // Vérifier si le mot est dans le dictionnaire
-        // if (!dictionary.includes(word)) return false;
+        if (await this.verifierMot(word) === false) {
+            console.log("verifierMot BON");
+            return false;
+        }
         // Vérifier si le mot a déjà été utilisé
-        if (usedWords.includes(word)) return false;
+        if (usedWords.includes(word)) {
+            return false;
+        }
+        console.log("LE MOT EST CORRECT");
         return true;
     }
 
     async verifierMot(mot) {
-        // const url = `https://fr.wiktionary.org/wiki/${encodeURIComponent(mot)}`;
-        //
-        // try {
-        //     const response = await fetch(url, { method: 'HEAD' });
-        //     if (response.ok) {
-        //         console.log(`Le mot "${mot}" existe sur le Wiktionnaire. ${response}`);
-        //         return true;
-        //     } else {
-        //         console.log(`Le mot "${mot}" n'existe pas.`);
-        //         return false;
-        //     }
-        // } catch (error) {
-        //     console.error("Erreur lors de la vérification :", error);
-        //     return false;
-        // }
+
         console.log("HAHAHAHAHAHHAHAH")
-        try {
-            // URL du dictionnaire de l'Académie française (page de recherche)
-            const url = "https://www.dictionnaire-academie.fr/search";
 
-            // Construction des données du formulaire
-            const formData = new URLSearchParams();
-            formData.append('term', mot);
-            formData.append('options', '1'); // 9e édition du dictionnaire
+        // URL du dictionnaire de l'Académie française (page de recherche)
+        const url = "https://www.dictionnaire-academie.fr/search";
 
-            // Configuration de la requête POST
-            const options = {
-                method: 'POST',
-                headers: new Headers({
-                    'Accept': 'application/json',
-                }),
-                body: formData,
-                // Ne pas définir Content-Type pour FormData (le navigateur le fait automatiquement)
-            };
+        // Construction des données du formulaire
+        const formData = new URLSearchParams();
+        formData.append('term', mot);
+        formData.append('options', '1'); // 9e édition du dictionnaire
 
-            // Envoi de la requête
-            const response = await fetch(url, options);
+        // Configuration de la requête POST
+        const options = {
+            method: 'POST',
+            headers: new Headers({
+                'Accept': 'application/json',
+            }),
+            body: formData,
+            // Ne pas définir Content-Type pour FormData (le navigateur le fait automatiquement)
+        };
 
-            if (!response.ok) {
-                throw new Error(`Erreur HTTP: ${response.status} ${response.statusText}`);
+        // Envoi de la requête
+        const response = await fetch(url, options);
+
+        // if (!response.ok) {
+        //     throw new Error(`Erreur HTTP: ${response.status} ${response.statusText}`);
+        // }
+
+        const responseData = await response.json();
+        console.log("ResponseData : ", responseData)
+        console.log("TAILLE Res : ", responseData.result.length)
+        if (responseData.result.length > 0) {
+            const result = responseData.result[0];
+
+            console.log("Resultat : ", result)
+            console.log("SCOREBrut : ", result.score)
+            let scoreBrut = result.score;
+            let scoreWord = parseInt(scoreBrut, 10);
+            console.log("SCOREparse : ", scoreWord)
+            if (scoreBrut > 0.95) {
+                console.log("Le mot est bon")
+                return true;
+            } else {
+                console.log("Le mot est mauvais")
+                return false;
             }
-
-            const responseData = await response.json();
-            // console.log("ResponseData : ", responseData)
-
-            if(responseData.result.length > 0) {
-                const result = responseData.result[0];
-
-                console.log("Resultat : ", result)
-                console.log("SCORE : ", result.score)
-
-                if (parseInt(result.score, 10) > 0.95) {
-                    console.log("Le mot est bon")
-                    return true;
-                } else {
-                    console.log("Le mot est mauvais")
-                    return false;
-                }
-            }else{
-                console.log("Le mot est pas bon")
-                return false
-            }
-            // if (contentType && contentType.includes('application/json')) {
-            //     // Si la réponse est JSON
-            //     resultat = await response.json();
-            // }
-            // console.log("Resultat : ", resultat)
-            // return resultat;
-
-        } catch (erreur) {
-            console.error("Erreur lors de la requête:", erreur);
-            throw erreur;
+        }else{
+            console.log("Le mot est pas bon")
+            return false
         }
+        // if (contentType && contentType.includes('application/json')) {
+        //     // Si la réponse est JSON
+        //     resultat = await response.json();
+        // }
+        // console.log("Resultat : ", resultat)
+        // return resultat;
+
+
     }
 }
 
