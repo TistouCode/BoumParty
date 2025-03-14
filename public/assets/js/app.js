@@ -18,6 +18,7 @@ const socket = io(
 let divPlayer = document.getElementById('divPlayer');
 let userList = document.getElementById('userList');
 let tabUsers = []
+let timer = document.getElementById('timer');
 
 socket.on('game-start', () => {
     console.log('La partie commence !');
@@ -31,6 +32,12 @@ inputProposition.addEventListener('keydown', function(event) {
         inputProposition.value = '';
     }
 });
+
+socket.on('pre-game-timer', (timeLeft) => {
+    timer.textContent = timeLeft;
+});
+
+
 
 // Signal reçu lorsqu'un mot est validé
 socket.on('word', (word) => {
@@ -202,7 +209,6 @@ socket.on('sequence', (seq) => {
 })
 
 socket.on('timer', (time) => {
-    let timer = document.getElementById('timer');
     timer.textContent = time;
 })
 

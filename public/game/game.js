@@ -80,7 +80,6 @@ export class Boum {
         io.to(this._currentPlayerSocketId ).emit('you-are-current-player', this._actualPlayer);
     }
 
-
     /**
      * @brief Démarre la partie si elle n'est pas déjà en cours
      */
@@ -89,15 +88,29 @@ export class Boum {
             this._inGame = true;
             console.log("DÉBUT DE LA PARTIE");
 
-            this.switchPlayer(io, gameId);
-            this._actualPlayer.play = true;
-            io.to(gameId).emit('game-start');
-            io.to(gameId).emit('actual-player', this._actualPlayer.uuid);
-
-            this.startTimer(io, gameId);
+            // Start the pre-game timer
+            this.startPreGameTimer(io, gameId);
         } else {
             console.log("PARTIE DÉJÀ EN COURS");
         }
+    }
+
+
+    startPreGameTimer(io, gameId) {
+        let preGameTimeLeft = 15;
+        const preGameInterval = setInterval(() => {
+            io.to(gameId).emit('pre-game-timer', preGameTimeLeft);
+            preGameTimeLeft--;
+
+            if (preGameTimeLeft < 0) {
+                clearInterval(preGameInterval);
+                this.switchPlayer(io, gameId);
+                this._actualPlayer.play = true;
+                io.to(gameId).emit('game-start');
+                io.to(gameId).emit('actual-player', this._actualPlayer.uuid);
+                this.startTimer(io, gameId);
+            }
+        }, 1000);
     }
 
     /**
