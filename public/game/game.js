@@ -236,9 +236,9 @@ export class Boum {
     isValidWord(word, sequence, usedWords) {
         word = word.toLowerCase().trim();
         // Vérifier si le mot contient la séquence
-        if(sequence){
-            if (!word.includes(sequence.toLowerCase())) return false;
-        }
+        // if(sequence){
+        //     if (!word.includes(sequence.toLowerCase())) return false;
+        // }
 
         if(!this.verifierMot(word)) return false;
         // Vérifier si le mot est dans le dictionnaire
@@ -291,18 +291,19 @@ export class Boum {
                 throw new Error(`Erreur HTTP: ${response.status} ${response.statusText}`);
             }
 
-            const result = (await response.json())['result'];
-            // Analyse de la réponse (peut être HTML ou JSON selon le site)
-            const contentType = response.headers.get('content-type');
-            let resultat;
+            const responseData = await response.json();
+            console.log("ResponseData : ", responseData)
 
+            const result = responseData.result;
 
-            if (contentType && contentType.includes('application/json')) {
-                // Si la réponse est JSON
-                resultat = await response.json();
-            }
-            console.log("Resultat : ", resultat)
-            return resultat;
+            console.log("Resultat : ", result)
+
+            // if (contentType && contentType.includes('application/json')) {
+            //     // Si la réponse est JSON
+            //     resultat = await response.json();
+            // }
+            // console.log("Resultat : ", resultat)
+            // return resultat;
 
         } catch (erreur) {
             console.error("Erreur lors de la requête:", erreur);
