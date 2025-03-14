@@ -97,7 +97,7 @@ export class Boum {
 
 
     startPreGameTimer(io, gameId) {
-        let preGameTimeLeft = 15;
+        let preGameTimeLeft = 3;
         const preGameInterval = setInterval(() => {
             io.to(gameId).emit('pre-game-timer', preGameTimeLeft);
             preGameTimeLeft--;
@@ -249,9 +249,9 @@ export class Boum {
     isValidWord(word, sequence, usedWords) {
         word = word.toLowerCase().trim();
         // Vérifier si le mot contient la séquence
-        // if(sequence){
-        //     if (!word.includes(sequence.toLowerCase())) return false;
-        // }
+        if(sequence){
+            if (!word.includes(sequence.toLowerCase())) return false;
+        }
 
         if(!this.verifierMot(word)) return false;
         // Vérifier si le mot est dans le dictionnaire
@@ -283,7 +283,7 @@ export class Boum {
             const url = "https://www.dictionnaire-academie.fr/search";
 
             // Construction des données du formulaire
-            const formData = new FormData();
+            const formData = new URLSearchParams();
             formData.append('term', mot);
             formData.append('options', '1'); // 9e édition du dictionnaire
 
@@ -305,12 +305,19 @@ export class Boum {
             }
 
             const responseData = await response.json();
-            console.log("ResponseData : ", responseData)
+            // console.log("ResponseData : ", responseData)
 
             const result = responseData.result;
 
-            console.log("Resultat : ", result)
+            console.log("Resultat : ", result[0])
+            console.log("SCORE : ",result.label)
 
+            if(parseInt(result.score, 10) > 0.95){
+                console.log("NFEOFHEOEFEFHOEHO")
+                return true;
+            }else{
+                return false;
+            }
             // if (contentType && contentType.includes('application/json')) {
             //     // Si la réponse est JSON
             //     resultat = await response.json();
@@ -323,9 +330,5 @@ export class Boum {
             throw erreur;
         }
     }
-
-
-
-
 }
 
