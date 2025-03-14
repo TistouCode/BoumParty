@@ -307,16 +307,22 @@ export class Boum {
             const responseData = await response.json();
             // console.log("ResponseData : ", responseData)
 
-            const result = responseData.result;
+            if(responseData.result.length > 0) {
+                const result = responseData.result[0];
 
-            console.log("Resultat : ", result[0])
-            console.log("SCORE : ",result.label)
+                console.log("Resultat : ", result)
+                console.log("SCORE : ", result.score)
 
-            if(parseInt(result.score, 10) > 0.95){
-                console.log("NFEOFHEOEFEFHOEHO")
-                return true;
+                if (parseInt(result.score, 10) > 0.95) {
+                    console.log("Le mot est bon")
+                    return true;
+                } else {
+                    console.log("Le mot est mauvais")
+                    return false;
+                }
             }else{
-                return false;
+                console.log("Le mot est pas bon")
+                return false
             }
             // if (contentType && contentType.includes('application/json')) {
             //     // Si la réponse est JSON
