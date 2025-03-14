@@ -1,6 +1,6 @@
 import fs from 'fs';
 import config from '../../config.json' with {type: 'json'};
-
+import frenchWords from 'an-array-of-french-words/index.json' with { type: 'json' };
 
 let indexJoueur =  Math.floor(Math.random() * 1000) % 3;
 // Fichier game.js
@@ -320,22 +320,16 @@ export class Boum {
             if (scoreBrut > 0.95) {
                 console.log("Le mot est bon")
                 return true;
-            } else {
-                console.log("Le mot est mauvais")
-                return false;
             }
+
+        }
+        if(frenchWords.includes(mot)){
+            console.log("Le mot est dans les frenchs words")
+            return true
         }else{
-            console.log("Le mot est pas bon")
+            console.log("Le mot n'est pas dans les frenchs words")
             return false
         }
-        // if (contentType && contentType.includes('application/json')) {
-        //     // Si la réponse est JSON
-        //     resultat = await response.json();
-        // }
-        // console.log("Resultat : ", resultat)
-        // return resultat;
-
-
     }
 }
 

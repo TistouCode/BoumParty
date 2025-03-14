@@ -11,7 +11,7 @@ const socket = io(
             gameId: gameId,
             token: token
         },
-        path: `/${window.location.pathname.split('/').at(1)}/socket.io`
+        // path: `/${window.location.pathname.split('/').at(1)}/socket.io`
     }
 );
 
@@ -73,7 +73,7 @@ socket.on('user-list', (players) => {
             "player",
             "player-card",
             "rounded-xl",
-            "p-4",
+            "p-2",
             "flex",
             "flex-col",
             "items-center",
