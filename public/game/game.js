@@ -117,6 +117,7 @@ export class Boum {
                 this._actualPlayer.play = true;
                 io.to(gameId).emit('game-start');
                 io.to(gameId).emit('actual-player', this._actualPlayer.uuid);
+
                 this.startTimer(io, gameId);
             }
         }, 1000);

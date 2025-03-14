@@ -11,7 +11,7 @@ const socket = io(
             gameId: gameId,
             token: token
         },
-        path: `/${window.location.pathname.split('/').at(1)}/socket.io`
+        // path: `/${window.location.pathname.split('/').at(1)}/socket.io`
     }
 );
 
@@ -22,6 +22,7 @@ let timer = document.getElementById('timer');
 
 socket.on('game-start', () => {
     console.log('La partie commence !');
+    timer.classList.add('hidden');
 });
 
 let inputProposition = document.getElementById('inputProposition');

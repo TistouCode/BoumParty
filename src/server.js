@@ -174,7 +174,7 @@ io.on('connection', (socket) => {
 
             // Ajouter le mot à la liste des mots utilisés
             currentGame._usedWords.push(proposition);
-            currentGame._timeLeft += 2;
+            currentGame._timeLeft += 3;
             // Ajouter le mot au joueur actif
             // currentGame._scores.get(currentGame._actualPlayer.username).words.push(proposition);
             validWord = true;
