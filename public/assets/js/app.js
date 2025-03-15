@@ -78,31 +78,32 @@ socket.on('game-start', () => {
     console.log('La partie commence !');
     timer.classList.add('hidden');
 });
-
+const ignoredKeys = [
+    'Enter', 'Control', 'Shift', 'Alt', 'Tab', 'CapsLock', 'Escape', 'ArrowLeft', 'ArrowRight',
+    'ArrowUp', 'ArrowDown', 'Backspace', 'Delete', 'Meta'
+];
 let inputProposition = document.getElementById('inputProposition');
 inputProposition.addEventListener('keydown', function(event) {
     if (event.key === 'Enter') {
         let proposition = inputProposition.value;
-        console.log("PROPOSITION : ", proposition)
+        console.log("PROPOSITION LORS DE ENTREE: ", proposition)
         socket.emit('proposition', proposition);
+        // socket.emit('deleteActualPropositionOnTheInput');
         inputProposition.value = '';
     }
-    const ignoredKeys = [
-        'Enter', 'Control', 'Shift', 'Alt', 'Tab', 'CapsLock', 'Escape', 'ArrowLeft', 'ArrowRight',
-        'ArrowUp', 'ArrowDown', 'Backspace', 'Delete', 'Meta'
-    ];
+
     if (!ignoredKeys.includes(event.key)) {
         socket.emit('typing', event.key)
     }
 });
 
-socket.on('deleteActualPropositionOnTheInput', (playerUuid) => {
-    console.log("SON UUID : ", playerUuid)
-    let actualPlayerProposition = document.getElementById(`${playerUuid}-proposition`);
-    console.log("BALISE : ", actualPlayerProposition)
-    actualPlayerProposition.textContent = "";
-
-})
+// socket.on('deleteActualPropositionOnTheInput', (playerUuid) => {
+//     console.log("SON UUID : ", playerUuid)
+//     let actualPlayerProposition = document.getElementById(`${playerUuid}-proposition`);
+//     console.log("PROPOSITION AVANT SUPPRESSION: ", actualPlayerProposition.textContent)
+//     actualPlayerProposition.textContent = "";
+//     console.log("PROPOSITION LORS DE SUPPRESSION: ", actualPlayerProposition.textContent)
+// })
 
 
 socket.on('typingKey', (data ) => { // data = [playerUuid, key]
@@ -367,4 +368,12 @@ socket.on('game-over', (winner) => {
     document.getElementById("divPlayer").appendChild(victoryMessage);
 
     inputProposition.disabled = true;
+
+
 });
+
+
+
+socket.on('redirect', data => {
+    window.parent.postMessage('redirectHome', data.url);
+})

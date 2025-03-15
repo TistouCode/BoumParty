@@ -222,6 +222,11 @@ export class Boum {
             }
 
             console.log(`Résultat de la partie ${this._id} envoyé au serveur de Comus Party avec succès`);
+            setTimeout(() => {
+                io.to(gameId).emit('redirect', {
+                    url: `${config.URL_COMUS}`,
+                });
+            }, 5000)
             return true;
         } catch (error) {
             console.error(`Erreur lors de l'envoi du résultat de la partie ${this._id} au serveur de Comus Party:`, error);
