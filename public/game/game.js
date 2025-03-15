@@ -105,7 +105,7 @@ export class Boum {
 
 
     startPreGameTimer(io, gameId) {
-        let preGameTimeLeft = 3;
+        let preGameTimeLeft = 10;
         const preGameInterval = setInterval(() => {
             io.to(gameId).emit('pre-game-timer', preGameTimeLeft);
             preGameTimeLeft--;
