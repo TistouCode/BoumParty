@@ -33,7 +33,6 @@ function updateVolume(volume) {
     });
 
     volumePercentage.textContent = Math.round(volume * 100) + "%";
-    console.log(volume)
     // Changer l’icône en fonction du volume
     if (volume == 0) {
         volumeIcon.textContent = "🔇"; // Muet
@@ -84,6 +83,7 @@ let inputProposition = document.getElementById('inputProposition');
 inputProposition.addEventListener('keydown', function(event) {
     if (event.key === 'Enter') {
         let proposition = inputProposition.value;
+        console.log("PROPOSITION : ", proposition)
         socket.emit('proposition', proposition);
         inputProposition.value = '';
     }
@@ -111,8 +111,6 @@ socket.on('typingKey', (data ) => { // data = [playerUuid, key]
     let playerUuid = data[0];
     let key = data[1];
     let propositionPlayerInLive = document.getElementById(`${playerUuid}-proposition`);
-    console.log(propositionPlayerInLive)
-    console.log("UUID / ", playerUuid)
     propositionPlayerInLive.textContent += key;
 })
 
@@ -137,7 +135,6 @@ socket.on('word', (dataWord) => { // dataWord = [proposition, validWord, playerU
     let playerUuid = dataWord[2];
     let natureMot = dataWord[3];
     let definitionURL = dataWord[4];
-    console.log("PLAYER WHO WRITE IS : ", playerUuid)
     let playerElementWhoWriteTheProposition = document.getElementById(playerUuid);
     let playerPropositionElement = document.getElementById(`${playerUuid}-proposition`);
     if(validWord===true){ // Si le mot est correct
@@ -278,7 +275,6 @@ socket.on('boum', (player)=>{
     const bombExplosionAudio = document.getElementById("bombExplosionAudio");
     bombExplosionAudio.play();
     let playerElement = document.getElementById(player.uuid);
-    console.log("PLAYER ELEMENT", playerElement.children)
     let heartList = document.getElementById(`${player.uuid}-lives`);
     let propositionPlayer = document.getElementById(`${player.uuid}-proposition`);
     let playerName = document.getElementById(`${player.uuid}-name`);
@@ -301,7 +297,6 @@ socket.on('actual-player', (playerUuid) => {
 function updateActualPlayer(playerUuid) {
     let players = document.querySelectorAll('.player');
     let playerName = document.getElementById(`${playerUuid}-name`);
-    console.log("PLAYERUUID", playerUuid)
     players.forEach(player => {
         // On enlève le style rouge et gras à tous les joueurs
         document.getElementById(`${player.id}-name`).classList.remove("text-red-500", "font-bold");
@@ -318,16 +313,16 @@ function updateActualPlayer(playerUuid) {
 }
 
 
-socket.on('you-are-current-player', (player) => {
+socket.on('you-are-current-player', (playerUuid) => {
     console.log("Vous êtes le joueur actif !");
     inputProposition.disabled = false;
     inputProposition.focus();
-    console.log("YOU ARE CURRENT : ", player)
-    currentActualPlayerUuid = player.uuid;
-    updateActualPlayer(player.uuid);
+    console.log("YOU ARE CURRENT : ", playerUuid)
+    currentActualPlayerUuid = playerUuid;
+    updateActualPlayer(currentActualPlayerUuid);
 })
 
-socket.on('you-are-not-current-player', (player) => {
+socket.on('you-are-not-current-player', (playerUuid) => {
     console.log("Vous êtes pas le joueur actif !");
     inputProposition.value = '';
     inputProposition.disabled = true;

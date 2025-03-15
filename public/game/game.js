@@ -79,13 +79,13 @@ export class Boum {
         io.to(gameId).emit('sequence', this._currentSequence);
 
         if (this._currentPlayerSocketId != null) {
-            io.to(this._currentPlayerSocketId).emit('you-are-not-current-player', this._actualPlayer);
+            io.to(this._currentPlayerSocketId).emit('you-are-not-current-player', this._actualPlayer.uuid);
         }
         io.to(gameId).emit('actual-player', this._actualPlayer.uuid);
 
         this._currentPlayerSocketId = this._actualPlayer.socketId
         console.log("Joueur actuel :", this._currentPlayerSocketId);
-        io.to(this._currentPlayerSocketId).emit('you-are-current-player', this._actualPlayer);
+        io.to(this._currentPlayerSocketId).emit('you-are-current-player', this._actualPlayer.uuid);
     }
 
     /**
