@@ -140,7 +140,7 @@ socket.on('word', (dataWord) => { // dataWord = [proposition, validWord, playerU
     let playerPropositionElement = document.getElementById(`${playerUuid}-proposition`);
     if(validWord===true){ // Si le mot est correct
         console.log("MOT VALIDE")
-        playerPropositionElement.textContent = proposition;
+        // playerPropositionElement.textContent = proposition;
         playerPropositionElement.classList.remove("text-red-500")
         playerPropositionElement.classList.add("text-green-500")
         const wordsOkAudio = document.getElementById("wordsOkAudio");
@@ -176,7 +176,7 @@ socket.on('word', (dataWord) => { // dataWord = [proposition, validWord, playerU
 
     }else if(validWord === false){ // Si le mot est incorrect
         console.log("MOT INVALIDE")
-        playerPropositionElement.textContent = proposition;
+        // playerPropositionElement.textContent = proposition;
         playerPropositionElement.classList.remove("text-red-500")
         playerPropositionElement.classList.add("text-red-500")
     }
@@ -285,7 +285,7 @@ socket.on('boum', (player)=>{
     // Supprimer l'animation du joueur qui vient de perdre
     playerElement.classList.remove("active-player");
 
-    propositionPlayer.textContent = player.actualWord;
+    // propositionPlayer.textContent = player.actualWord;
 })
 
 
@@ -298,6 +298,8 @@ socket.on('actual-player', (playerUuid) => {
 function updateActualPlayer(playerUuid) {
     let players = document.querySelectorAll('.player');
     let playerName = document.getElementById(`${playerUuid}-name`);
+    let playerProposition = document.getElementById(`${playerUuid}-proposition`);
+    playerProposition.textContent = ""; // On vide la proposition du joueur actif
     players.forEach(player => {
         // On enlève le style rouge et gras à tous les joueurs
         document.getElementById(`${player.id}-name`).classList.remove("text-red-500", "font-bold");

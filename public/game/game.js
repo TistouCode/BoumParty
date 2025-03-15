@@ -1,7 +1,7 @@
 import fs from 'fs';
 import config from '../../config.json' with {type: 'json'};
 import frenchWords from 'an-array-of-french-words/index.json' with {type: 'json'};
-
+import sequencesTab from '../assets/sequences.json' with { type: 'json' };
 let indexJoueur = Math.floor(Math.random() * 1000) % 3;
 
 // Fichier game.js
@@ -273,30 +273,8 @@ export class Boum {
      * @returns {string}
      */
     generateSequence() {
-        const commonVowels = 'aeiou';
-        const commonConsonants = 'bcdfghjklmnpqrst';
-
-        // Bigrammes courants en français
-        const frequentBigrams = ['ou', 'on', 'ai', 'en', 'an', 'et', 'er', 'in'];
-
-        // Stratégies simplifiées
-        const strategies = [
-            // Utiliser un bigramme fréquent
-            () => frequentBigrams[Math.floor(Math.random() * frequentBigrams.length)],
-
-            // Consonne + Voyelle (fréquent)
-            () => commonConsonants.charAt(Math.floor(Math.random() * commonConsonants.length)) +
-                commonVowels.charAt(Math.floor(Math.random() * commonVowels.length)),
-
-            // Consonne + Voyelle + Consonne (mais avec des lettres courantes)
-            () => commonConsonants.charAt(Math.floor(Math.random() * commonConsonants.length)) +
-                commonVowels.charAt(Math.floor(Math.random() * commonVowels.length)) +
-                commonConsonants.charAt(Math.floor(Math.random() * commonConsonants.length))
-        ];
-
-        // Choisir une stratégie aléatoire
-        const strategy = strategies[Math.floor(Math.random() * strategies.length)];
-        return strategy();
+        let sequence = sequencesTab.sequences[Math.floor(Math.random() * sequencesTab.sequences.length)];
+        return sequence;
     }
 
     /**
