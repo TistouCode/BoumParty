@@ -1,10 +1,27 @@
 import fs from 'fs';
 import config from '../../config.json' with {type: 'json'};
-import frenchWords from 'an-array-of-french-words/index.json' with { type: 'json' };
+import frenchWords from 'an-array-of-french-words/index.json' with {type: 'json'};
 
-let indexJoueur =  Math.floor(Math.random() * 1000) % 3;
+let indexJoueur = Math.floor(Math.random() * 1000) % 3;
+
 // Fichier game.js
+
+/**
+ * @brief Classe représentant une partie de Boum Party
+ * @details Cette classe gère le déroulement d'une partie de Boum Party
+ */
+
 export class Boum {
+
+    /**
+     * @brief Constructeur de la classe Boum
+     * @param id Identifiant de la partie
+     * @param bombDuration Durée de la bombe (en secondes)
+     * @param lifePerPlayer Nombre de vies par joueur
+     * @param players Liste des joueurs
+     * @param inGame Indique si la partie est en cours
+     * @param gameToken Token de la partie
+     */
     constructor(id, bombDuration = 5, lifePerPlayer = 3, players = [], inGame = false, gameToken) {
         this._id = id;
         this._scores = new Map();
@@ -48,14 +65,20 @@ export class Boum {
         });
     }
 
-    defineFirstPlayer(){
+    /**
+     * @brief Définit le premier joueur de la partie
+     * @details Le premier joueur est choisi aléatoirement parmi les joueurs en vie
+     */
+    defineFirstPlayer() {
         let alivePlayers = Array.from(this._scores.values()).filter(player => player.live === true);
-        let indexJoueur =  Math.floor(Math.random() * 1000) % alivePlayers.length;
+        let indexJoueur = Math.floor(Math.random() * 1000) % alivePlayers.length;
         let firstPlayer = alivePlayers[indexJoueur];
         this._actualPlayer = firstPlayer;
     }
+
     /**
      * @brief Tire un joueur au hasard
+     * @details Tire un joueur au hasard parmi les joueurs en vie
      */
     drawActualPlayer() {
         // Filtrer les joueurs qui sont encore en vie
@@ -64,7 +87,7 @@ export class Boum {
         // Si il y a des joueurs vivants
         if (alivePlayers.length > 0) {
             // Tirer au hasard un joueur parmi les vivants
-            let actualPlayer = alivePlayers[indexJoueur%alivePlayers.length];
+            let actualPlayer = alivePlayers[indexJoueur % alivePlayers.length];
             this._actualPlayer = actualPlayer;
             return actualPlayer;
         } else {
@@ -73,6 +96,11 @@ export class Boum {
         }
     }
 
+    /**
+     * @brief Change de joueur et informe les clients
+     * @param io Objet de communication avec Socket.IO
+     * @param gameId Identifiant de la partie
+     */
     switchPlayer(io, gameId) {
         this.drawActualPlayer();
         this._currentSequence = this.generateSequence();
@@ -90,6 +118,9 @@ export class Boum {
 
     /**
      * @brief Démarre la partie si elle n'est pas déjà en cours
+     * @param io Objet de communication avec Socket.IO
+     * @param gameId Identifiant de la partie
+     * @details Cette méthode démarre la partie si elle n'est pas déjà en cours
      */
     startGame(io, gameId) {
         if (!this._inGame) {
@@ -103,7 +134,12 @@ export class Boum {
         }
     }
 
-
+    /**
+     * @brief Démarre le timer pour le pré-jeu
+     * @param io Objet de communication avec Socket.IO
+     * @param gameId Identifiant de la partie
+     * @details Cette méthode démarre un timer de 10 secondes avant le début de la partie
+     */
     startPreGameTimer(io, gameId) {
         let preGameTimeLeft = 10;
         const preGameInterval = setInterval(() => {
@@ -126,6 +162,9 @@ export class Boum {
 
     /**
      * @brief Démarre le timer pour changer de joueur
+     * @param io Objet de communication avec Socket.IO
+     * @param gameId Identifiant de la partie
+     * @details Cette méthode démarre un timer de 5 secondes pour changer de joueur
      */
     startTimer(io, gameId) {
         if (!this._intervalRunning) {
@@ -138,7 +177,6 @@ export class Boum {
                 // CHRONO
                 io.to(gameId).emit('timer', this._timeLeft);
                 if (this._timeLeft === 0) {
-                    console.log("BOUM")
                     this._actualPlayer.life--;
                     if (this._actualPlayer.life <= 0) {
                         // Supprimer le joueur de _scores par son username
@@ -148,8 +186,6 @@ export class Boum {
                         // Vérifie s'il ne reste qu'un seul joueur en vie
                         let alivePlayers = Array.from(this._scores.values()).filter(player => player.live === true);
                         if (alivePlayers.length === 1) {
-                            console.log("FIN DE LA PARTIE");
-
                             io.to(gameId).emit('boum', this._actualPlayer);
                             this.endGame(io, gameId);
                             return; // Stoppe l'exécution du timer
@@ -167,11 +203,10 @@ export class Boum {
     }
 
     /**
-     * @brief Change de joueur et informe les clients
-     */
-
-    /**
      * @brief Arrête le jeu et le timer
+     * @param io Objet de communication avec Socket.IO
+     * @param gameId Identifiant de la partie
+     * @details Cette méthode arrête le jeu et le timer
      */
     async endGame(io, gameId) {
         if (this._interval) {
@@ -180,7 +215,6 @@ export class Boum {
             this._intervalRunning = false;
         }
         let alivePlayers = Array.from(this._scores.values()).filter(player => player.live === true);
-        console.log(alivePlayers)
         let results = {}
         let winner = alivePlayers[0]
         let winnerUuid = winner.uuid;
@@ -196,7 +230,6 @@ export class Boum {
                 winner: isWinner,
             }
         });
-        console.log(results);
         this._inGame = false;
         io.to(gameId).emit('game-over', winner); // Envoie le gagnant
         try {
@@ -234,6 +267,11 @@ export class Boum {
         }
     }
 
+    /**
+     * @brief Génère une séquence de lettres aléatoire
+     * @details Cette méthode génère une séquence de lettres aléatoire
+     * @returns {string}
+     */
     generateSequence() {
         const commonVowels = 'aeiou';
         const commonConsonants = 'bcdfghjklmnpqrst';
@@ -261,6 +299,14 @@ export class Boum {
         return strategy();
     }
 
+    /**
+     * @brief Vérifie si un mot est valide
+     * @details Cette méthode vérifie si un mot est valide
+     * @param word Mot à vérifier
+     * @param sequence Séquence à respecter
+     * @param usedWords Mots déjà utilisés
+     * @returns {Promise<(boolean|*)[]|boolean>} Renvoie true si le mot est valide, false sinon
+     */
     async isValidWord(word, sequence, usedWords) {
         word = word.toLowerCase().trim();
         // Vérifier si le mot contient la séquence
@@ -271,9 +317,7 @@ export class Boum {
         }
 
         let dataVerifMot = await this.verifierMot(word);
-        console.log("DATA VERIF MOT : ", dataVerifMot)
-        if(dataVerifMot[0] === false || dataVerifMot === false){
-            console.log("LE MOT N'EST PAS CORRECT")
+        if (dataVerifMot[0] === false || dataVerifMot === false) {
             return false
         }
 
@@ -281,9 +325,15 @@ export class Boum {
         if (usedWords.includes(word)) {
             return false;
         }
-        console.log("LE MOT EST CORRECT");
         return [true, dataVerifMot[1], dataVerifMot[2]]
     }
+
+    /**
+     * @brief Vérifie si un mot est correct
+     * @details Cette méthode vérifie si un mot est correct en consultant le dictionnaire de l'Académie française
+     * @param mot Mot à vérifier
+     * @returns {Promise<(boolean|*)[]|boolean>} Renvoie true si le mot est correct, false sinon
+     */
 
     async verifierMot(mot) {
 
@@ -306,30 +356,19 @@ export class Boum {
             body: formData,
             // Ne pas définir Content-Type pour FormData (le navigateur le fait automatiquement)
         };
-
         // Envoi de la requête
         const response = await fetch(url, options);
-
-
         const responseData = await response.json();
-        console.log("TAILLE Res : ", responseData.result.length)
         if (responseData.result.length > 0) {
             const result = responseData.result[0];
-
-            console.log("Resultat : ", result)
-            console.log("SCOREBrut : ", result.score)
             let scoreBrut = result.score;
             if (scoreBrut > 0.95) {
-                console.log("Le mot est bon")
                 return [true, result.nature, result.url];
             }
-
         }
-        if(frenchWords.includes(mot)){
-            console.log("Le mot est dans les frenchs words")
+        if (frenchWords.includes(mot)) {
             return true
-        }else{
-            console.log("Le mot n'est pas dans les frenchs words")
+        } else {
             return false
         }
     }
