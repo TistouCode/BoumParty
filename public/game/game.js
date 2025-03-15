@@ -141,7 +141,7 @@ export class Boum {
      * @details Cette méthode démarre un timer de 10 secondes avant le début de la partie
      */
     startPreGameTimer(io, gameId) {
-        let preGameTimeLeft = 10;
+        let preGameTimeLeft = 3;
         const preGameInterval = setInterval(() => {
             io.to(gameId).emit('pre-game-timer', preGameTimeLeft);
             preGameTimeLeft--;
@@ -182,7 +182,7 @@ export class Boum {
                         // Supprimer le joueur de _scores par son username
                         this._actualPlayer.live = false;
                         io.to(gameId).emit('player-death', this._actualPlayer);
-
+                        indexJoueur++;
                         // Vérifie s'il ne reste qu'un seul joueur en vie
                         let alivePlayers = Array.from(this._scores.values()).filter(player => player.live === true);
                         if (alivePlayers.length === 1) {

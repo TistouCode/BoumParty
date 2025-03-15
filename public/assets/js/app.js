@@ -11,7 +11,7 @@ const socket = io(
             gameId: gameId,
             token: token
         },
-        path: `/${window.location.pathname.split('/').at(1)}/socket.io`
+        // path: `/${window.location.pathname.split('/').at(1)}/socket.io`
     }
 );
 
@@ -80,7 +80,7 @@ socket.on('game-start', () => {
 });
 const ignoredKeys = [
     'Enter', 'Control', 'Shift', 'Alt', 'Tab', 'CapsLock', 'Escape', 'ArrowLeft', 'ArrowRight',
-    'ArrowUp', 'ArrowDown', 'Backspace', 'Delete', 'Meta'
+    'ArrowUp', 'ArrowDown','Meta'
 ];
 let inputProposition = document.getElementById('inputProposition');
 inputProposition.addEventListener('keydown', function(event) {
@@ -109,10 +109,19 @@ inputProposition.addEventListener('keydown', function(event) {
 socket.on('typingKey', (data ) => { // data = [playerUuid, key]
 
     console.log("TYPING : ", data[0])
+
     let playerUuid = data[0];
     let key = data[1];
+    console.log("KEY : ", key)
     let propositionPlayerInLive = document.getElementById(`${playerUuid}-proposition`);
-    propositionPlayerInLive.textContent += key;
+    if(key === "Backspace" || key === "Delete"){
+        propositionPlayerInLive.textContent = propositionPlayerInLive.textContent.slice(0, -1);
+        return;
+    }else{
+        propositionPlayerInLive.textContent += key;
+        return;
+    }
+
 })
 
 let preGameTimer = document.getElementById('preGameTimer');
@@ -298,8 +307,7 @@ socket.on('actual-player', (playerUuid) => {
 function updateActualPlayer(playerUuid) {
     let players = document.querySelectorAll('.player');
     let playerName = document.getElementById(`${playerUuid}-name`);
-    let playerProposition = document.getElementById(`${playerUuid}-proposition`);
-    playerProposition.textContent = ""; // On vide la proposition du joueur actif
+
     players.forEach(player => {
         // On enlève le style rouge et gras à tous les joueurs
         document.getElementById(`${player.id}-name`).classList.remove("text-red-500", "font-bold");
@@ -312,6 +320,9 @@ function updateActualPlayer(playerUuid) {
     if (actualPlayer) {
         playerName.classList.add("text-red-500", "font-bold");
         actualPlayer.classList.add("active-player"); // Ajoute l'animation au joueur actif
+        let playerProposition = document.getElementById(`${playerUuid}-proposition`);
+        playerProposition.textContent = ""; // On vide la proposition du joueur actif
+        playerProposition.classList.remove("text-red-500", "text-green-500");
     }
 }
 
@@ -322,6 +333,8 @@ socket.on('you-are-current-player', (playerUuid) => {
     inputProposition.focus();
     console.log("YOU ARE CURRENT : ", playerUuid)
     currentActualPlayerUuid = playerUuid;
+
+
     updateActualPlayer(currentActualPlayerUuid);
 })
 
