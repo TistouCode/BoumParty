@@ -128,14 +128,6 @@
 </div>
 <div id="flashOverlay" class="fixed top-0 left-0 w-full h-full hidden bg-red-500 z-50"></div>
 <div class="flex flex-col rounded-2xl w-4/5 md:w-3/5 lg:w-1/2 h-full m-1 shadow-2xl overflow-hidden" style="background-color: var(--dark-mid); border: 1px solid var(--primary-dark);">
-
-
-    <header class="flex justify-center items-center" style="background-color: var(--dark);">
-        <h1 class="text-3xl font-bold" style="color: var(--primary-light);">
-            <span class="mr-2">💣</span> BoumParty <span class="ml-2">💣</span>
-        </h1>
-    </header>
-
     <div id="divPlayer" class="w-full flex-1 flex justify-center items-center flex-col p-3 relative">
 
         <div class="mb-4 w-full">
@@ -173,6 +165,23 @@
     <span id="volumePercentage" class="text-sm">100%</span>
 
 </div>
+
+<!-- Bouton pour afficher le menu -->
+<button id="menu-button" class="fixed top-5 right-5 text-white p-3 rounded-full shadow-lg">
+    ☰
+</button>
+
+<!-- Menu coulissant -->
+<div id="side-menu" class="fixed top-0 right-0 h-full w-64 bg-gray-800 text-white transform translate-x-full transition-transform duration-500 ease-in-out">
+    <div class="flex justify-between p-4">
+        <h2 class="text-lg font-semibold">Menu</h2>
+        <button id="close-button" class="text-xl text-white hover:text-gray-400">×</button>
+    </div>
+    <ul class="p-4 space-y-2" id="dicoWords">
+        <!-- Les mots du dictionnaire seront ajoutés dynamiquement ici -->
+    </ul>
+</div>
+
 <audio src="../assets/audio/bombe_explosion.mp3" id="bombExplosionAudio" class="audio hidden"></audio>
 <script src="../socket.io/socket.io.js"></script>
 <script src="../assets/js/app.js"></script>

@@ -165,12 +165,13 @@ io.on('connection', (socket) => {
         currentGame._actualPlayer.actualWord = proposition;
         let playerWhoWriteTheProposition = currentGame._actualPlayer;
         let validWord = false;
-        // console.log('papapapa : ', currentGame.isValidWord(proposition, currentGame._currentSequence, currentGame._usedWords))
+
         // Vérifier si le mot est valide
+
+        // resProposition = [bool, natureWord, URlWord]
         let resProposition = await currentGame.isValidWord(proposition, currentGame._currentSequence, currentGame._usedWords);
         console.log(resProposition);
-        if (resProposition) {
-            console.log('Mot valide !');
+        if (resProposition[0]) {
 
             // Ajouter le mot à la liste des mots utilisés
             currentGame._usedWords.push(proposition);
@@ -179,8 +180,8 @@ io.on('connection', (socket) => {
             // currentGame._scores.get(currentGame._actualPlayer.username).words.push(proposition);
             validWord = true;
             // Changer de joueur
-            console.log("JE RENVOIE A l'USER : ", [proposition, validWord, playerWhoWriteTheProposition.uuid])
-            io.to(gameId).emit('word', [proposition, validWord, playerWhoWriteTheProposition.uuid]);
+            console.log("JE RENVOIE A l'USER : ", [proposition, validWord, playerWhoWriteTheProposition.uuid, resProposition[1], resProposition[2]])
+            io.to(gameId).emit('word', [proposition, validWord, playerWhoWriteTheProposition.uuid, resProposition[1], resProposition[2]]);
             currentGame.switchPlayer(io, gameId);
 
         } else {
@@ -215,23 +216,6 @@ io.on('connection', (socket) => {
         console.log("Le joueur reste actif même après sa déconnexion.");
     });
 });
-
-// Fonction pour tirer un joueur au hasard
-function tirageAuHasardJoueur(map) {
-    // Convertir la Map en tableau de clés
-    const joueursCles = Array.from(map.keys());
-
-    // Choisir un index aléatoire
-    const indexHasard = Math.floor(Math.random() * joueursCles.length);
-
-    // Obtenir la clé du joueur choisi
-    const joueurChoisi = joueursCles[indexHasard];
-
-    // Retourner la valeur (l'objet joueur)
-    return map.get(joueurChoisi);
-}
-
-
 
 // Démarrage du serveur
 const PORT = config.PORT;

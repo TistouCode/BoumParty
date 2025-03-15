@@ -141,7 +141,6 @@ export class Boum {
                     console.log("BOUM")
                     this._actualPlayer.life--;
                     if (this._actualPlayer.life <= 0) {
-                        console.log("LE JOUEUR EST MORT : ", this._actualPlayer);
                         // Supprimer le joueur de _scores par son username
                         this._actualPlayer.live = false;
                         io.to(gameId).emit('player-death', this._actualPlayer);
@@ -266,16 +265,19 @@ export class Boum {
             }
         }
 
-        if (await this.verifierMot(word) === false) {
-            console.log("verifierMot BON");
-            return false;
+        let dataVerifMot = await this.verifierMot(word);
+        console.log("DATA VERIF MOT : ", dataVerifMot)
+        if(dataVerifMot[0] === false || dataVerifMot === false){
+            console.log("LE MOT N'EST PAS CORRECT")
+            return false
         }
+
         // Vérifier si le mot a déjà été utilisé
         if (usedWords.includes(word)) {
             return false;
         }
         console.log("LE MOT EST CORRECT");
-        return true;
+        return [true, dataVerifMot[1], dataVerifMot[2]]
     }
 
     async verifierMot(mot) {
@@ -303,12 +305,8 @@ export class Boum {
         // Envoi de la requête
         const response = await fetch(url, options);
 
-        // if (!response.ok) {
-        //     throw new Error(`Erreur HTTP: ${response.status} ${response.statusText}`);
-        // }
 
         const responseData = await response.json();
-        console.log("ResponseData : ", responseData)
         console.log("TAILLE Res : ", responseData.result.length)
         if (responseData.result.length > 0) {
             const result = responseData.result[0];
@@ -316,11 +314,9 @@ export class Boum {
             console.log("Resultat : ", result)
             console.log("SCOREBrut : ", result.score)
             let scoreBrut = result.score;
-            let scoreWord = parseInt(scoreBrut, 10);
-            console.log("SCOREparse : ", scoreWord)
             if (scoreBrut > 0.95) {
                 console.log("Le mot est bon")
-                return true;
+                return [true, result.nature, result.url];
             }
 
         }

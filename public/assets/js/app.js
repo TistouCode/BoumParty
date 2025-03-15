@@ -19,6 +19,8 @@ let divPlayer = document.getElementById('divPlayer');
 let userList = document.getElementById('userList');
 let tabUsers = []
 let timer = document.getElementById('timer');
+let dicoWords = document.getElementById('dicoWords');
+
 
 const volumeSlider = document.getElementById("volumeSlider");
 const volumeIcon = document.getElementById("volumeIcon");
@@ -50,17 +52,29 @@ volumeSlider.addEventListener("input", () => {
 // Appliquer le volume au chargement de la page
 updateVolume(volumeSlider.value);
 
-document.getElementById('bombExplosionAudio').addEventListener('play', function() {
-    const bomb = document.getElementById('bomb');
 
-    bomb.classList.add('explode');
 
-    setTimeout(() => {
-        bomb.classList.remove('explode');
-        bomb.classList.add('reappear');
-    }, 1000);
-    bomb.classList.remove('reappear');
+
+// Récupérer les éléments
+const menuButton = document.getElementById('menu-button');
+const sideMenu = document.getElementById('side-menu');
+const closeButton = document.getElementById('close-button');
+
+// Ouvrir le menu
+menuButton.addEventListener('click', () => {
+    sideMenu.classList.remove('translate-x-full');
+    sideMenu.classList.add('translate-x-0');
 });
+
+// Fermer le menu
+closeButton.addEventListener('click', () => {
+    sideMenu.classList.remove('translate-x-0');
+    sideMenu.classList.add('translate-x-full');
+});
+
+
+
+
 socket.on('game-start', () => {
     console.log('La partie commence !');
     timer.classList.add('hidden');
@@ -73,8 +87,15 @@ inputProposition.addEventListener('keydown', function(event) {
         socket.emit('proposition', proposition);
         inputProposition.value = '';
     }
-    console.log("event : ", event.key)
-    socket.emit('typing', event.key)
+    const ignoredKeys = [
+        'Enter', 'Control', 'Shift', 'Alt', 'Tab', 'CapsLock', 'Escape', 'ArrowLeft', 'ArrowRight',
+        'ArrowUp', 'ArrowDown', 'Backspace', 'Delete', 'Meta'
+    ];
+    if (!ignoredKeys.includes(event.key)) {
+        socket.emit('typing', event.key)
+    }
+
+
 
 
 });
@@ -103,11 +124,13 @@ socket.on('pre-game-timer', (timeLeft) => {
 
 
 // Signal reçu lorsqu'un mot est validé
-socket.on('word', (word) => {
-    console.log('Mot reçu :', word);
-    let proposition = word[0];
-    let validWord = word[1];
-    let playerUuid = word[2];
+socket.on('word', (dataWord) => { // dataWord = [proposition, validWord, playerUuid, natureMot, definitionURL]
+    console.log('Mot reçu :', dataWord);
+    let proposition = dataWord[0];
+    let validWord = dataWord[1];
+    let playerUuid = dataWord[2];
+    let natureMot = dataWord[3];
+    let definitionURL = dataWord[4];
     console.log("PLAYER WHO WRITE IS : ", playerUuid)
     let playerElementWhoWriteTheProposition = document.getElementById(playerUuid);
     let playerPropositionElement = document.getElementById(`${playerUuid}-proposition`);
@@ -116,6 +139,36 @@ socket.on('word', (word) => {
         playerPropositionElement.textContent = proposition;
         playerPropositionElement.classList.remove("text-red-500")
         playerPropositionElement.classList.add("text-green-500")
+
+
+
+        const li = document.createElement('li');
+        li.classList.add('p-2', 'bg-white', 'rounded-lg', 'shadow-md', 'hover:bg-gray-100', 'transition-all', 'space-y-2');
+
+        // Création du texte du mot et de sa nature
+        const wordText = document.createElement('p');
+        wordText.classList.add('font-semibold', 'text-black');
+        wordText.textContent = `${proposition} (${natureMot})`;
+
+        // Création du lien
+        const link = document.createElement('a');
+        link.classList.add('text-blue-500', 'hover:underline');
+
+        link.setAttribute('href', definitionURL);
+        link.setAttribute('target', '_blank');
+        link.textContent = definitionURL;
+
+        // Ajouter le mot et le lien au <li>
+        li.appendChild(wordText);
+        li.appendChild(link);
+
+        // Ajouter le <li> dans la liste
+
+        dicoWords.appendChild(li);
+
+
+
+
     }else if(validWord === false){ // Si le mot est incorrect
         console.log("MOT INVALIDE")
         playerPropositionElement.textContent = proposition;
@@ -123,6 +176,8 @@ socket.on('word', (word) => {
         playerPropositionElement.classList.add("text-red-500")
     }
 })
+
+
 
 
 
@@ -204,6 +259,15 @@ socket.on('user-list', (players) => {
 
 // Signal reçu lorsqu'un joueur a perdu une vie
 socket.on('boum', (player)=>{
+    const bomb = document.getElementById('bomb');
+
+    bomb.classList.add('explode');
+
+    setTimeout(() => {
+        bomb.classList.remove('explode');
+        bomb.classList.add('reappear');
+    }, 1000);
+    bomb.classList.remove('reappear');
     const bombExplosionAudio = document.getElementById("bombExplosionAudio");
     bombExplosionAudio.play();
     let playerElement = document.getElementById(player.uuid);
