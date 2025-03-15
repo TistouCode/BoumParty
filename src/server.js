@@ -172,7 +172,7 @@ io.on('connection', (socket) => {
         let validWord = false;
 
         // Vérifier si le mot est valide
-
+        currentGame._actualPlayer._alreadyPutAProposition = true;
         // resProposition = [bool, natureWord, URlWord]
         let resProposition = await currentGame.isValidWord(proposition, currentGame._currentSequence, currentGame._usedWords);
         console.log(resProposition);
@@ -200,10 +200,16 @@ io.on('connection', (socket) => {
 
     socket.on('typing', (key) => {
         console.log("KEY : ", key)
-        io.to(gameId).emit('typingKey', [currentGame._actualPlayer.uuid, key]);
+        io.to(gameId).emit('typingKey', {
+            playerUuid: currentGame._actualPlayer.uuid,
+            key: key,
+            alreadyPutAProposition: currentGame._actualPlayer._alreadyPutAProposition
+        });
     })
 
-
+    socket.on('infoAboutAlreadyPutAProposition', (alreadyPutAProposition) => {
+      currentGame._actualPlayer._alreadyPutAProposition = alreadyPutAProposition;
+    })
 
     // Gérer la déconnexion
     socket.on('disconnect', () => {

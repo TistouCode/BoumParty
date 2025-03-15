@@ -36,6 +36,7 @@ export class Boum {
         this._timeLeft = 0; // Temps restant pour le joueur actuel
         this._gameToken = gameToken; // Token de la partie
         this._currentPlayerSocketId = null;
+        this._alreadyPutAProposition = false;
         // Initialisation des joueurs
         players.forEach(player => this.addPlayer(player));
     }

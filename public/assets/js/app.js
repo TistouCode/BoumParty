@@ -106,22 +106,17 @@ inputProposition.addEventListener('keydown', function(event) {
 // })
 
 
-socket.on('typingKey', (data ) => { // data = [playerUuid, key]
+socket.on('typingKey', (data) => { // data = [playerUuid, key]
 
     console.log("TYPING : ", data[0])
 
-    let playerUuid = data[0];
-    let key = data[1];
+    let playerUuid = data.playerUuid;
+    let key = data.key;
+    let alreadyPutAProposition = data.alreadyPutAProposition;
+
     console.log("KEY : ", key)
     let propositionPlayerInLive = document.getElementById(`${playerUuid}-proposition`);
-    if(key === "Backspace" || key === "Delete"){
-        propositionPlayerInLive.textContent = propositionPlayerInLive.textContent.slice(0, -1);
-        return;
-    }else{
-        propositionPlayerInLive.textContent += key;
-        return;
-    }
-
+    propositionPlayerInLive.textContent = inputProposition.value
 })
 
 let preGameTimer = document.getElementById('preGameTimer');
@@ -147,9 +142,11 @@ socket.on('word', (dataWord) => { // dataWord = [proposition, validWord, playerU
     let definitionURL = dataWord[4];
     let playerElementWhoWriteTheProposition = document.getElementById(playerUuid);
     let playerPropositionElement = document.getElementById(`${playerUuid}-proposition`);
+    playerPropositionElement.textContent = '';
+
     if(validWord===true){ // Si le mot est correct
         console.log("MOT VALIDE")
-        // playerPropositionElement.textContent = proposition;
+        playerPropositionElement.textContent = proposition;
         playerPropositionElement.classList.remove("text-red-500")
         playerPropositionElement.classList.add("text-green-500")
         const wordsOkAudio = document.getElementById("wordsOkAudio");
@@ -157,7 +154,7 @@ socket.on('word', (dataWord) => { // dataWord = [proposition, validWord, playerU
 
 
         const li = document.createElement('li');
-        li.classList.add('p-2', 'bg-white', 'rounded-lg', 'shadow-md', 'hover:bg-gray-100', 'transition-all', 'space-y-2');
+        li.classList.add('p-2', 'bg-white', 'rounded-lg', 'shadow-md', 'hover:bg-gray-100', 'transition-all', 'space-y-2', 'h-32');
 
         // Création du texte du mot et de sa nature
         const wordText = document.createElement('p');
@@ -185,7 +182,10 @@ socket.on('word', (dataWord) => { // dataWord = [proposition, validWord, playerU
 
     }else if(validWord === false){ // Si le mot est incorrect
         console.log("MOT INVALIDE")
-        // playerPropositionElement.textContent = proposition;
+
+        playerPropositionElement.textContent = proposition;
+
+
         playerPropositionElement.classList.remove("text-red-500")
         playerPropositionElement.classList.add("text-red-500")
     }

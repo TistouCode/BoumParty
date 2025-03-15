@@ -171,15 +171,19 @@
     ☰
 </button>
 
+
 <!-- Menu coulissant -->
-<div id="side-menu" class="fixed top-0 right-0 h-full w-64 bg-gray-800 text-white transform translate-x-full transition-transform duration-500 ease-in-out overflow-y-auto scroll-auto">
+<div id="side-menu" class="fixed top-0 right-0 h-full w-64 bg-gray-800 text-white transform translate-x-full transition-transform duration-500 ease-in-out flex flex-col">
     <div class="flex justify-between p-4">
         <h2 class="text-lg font-semibold">Menu</h2>
         <button id="close-button" class="text-xl text-white hover:text-gray-400">×</button>
     </div>
-    <ul class="p-4 space-y-2" id="dicoWords">
-        <!-- Les mots du dictionnaire seront ajoutés dynamiquement ici -->
-    </ul>
+    <!-- Ajout d'un conteneur avec hauteur calculée et scrollbar -->
+    <div class="overflow-y-auto">
+        <ul class="p-4 space-y-2" id="dicoWords">
+            <!-- Les mots du dictionnaire seront ajoutés dynamiquement ici -->
+        </ul>
+    </div>
 </div>
 
 <audio src="../assets/audio/bombe_explosion.mp3" id="bombExplosionAudio" class="audio hidden"></audio>
