@@ -112,6 +112,7 @@ export class Boum {
 
             if (preGameTimeLeft < 0) {
                 clearInterval(preGameInterval);
+
                 this.defineFirstPlayer()
                 this.switchPlayer(io, gameId);
                 this._actualPlayer.play = true;

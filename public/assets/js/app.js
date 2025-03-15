@@ -89,8 +89,15 @@ socket.on('typingKey', (data ) => { // data = [playerUuid, key]
     propositionPlayerInLive.textContent += key;
 })
 
+let preGameTimer = document.getElementById('preGameTimer');
+let pregameOverlay = document.getElementById('pregameOverlay');
 socket.on('pre-game-timer', (timeLeft) => {
-    timer.textContent = timeLeft;
+    if(timeLeft === 0){
+        preGameTimer.textContent = "Début de partie !";
+        pregameOverlay.classList.add('hidden');
+
+    }
+    preGameTimer.textContent = "Début de partie dans " + timeLeft + " secondes";
 });
 
 
