@@ -161,7 +161,7 @@ io.on('connection', (socket) => {
     // Gérer les propositions de mots
     socket.on('proposition', async (proposition) => {
         console.log('Proposition reçue:', proposition);
-
+        io.to(gameId).emit('deleteActualPropositionOnTheInput', currentGame._actualPlayer.uuid);
         currentGame._actualPlayer.actualWord = proposition;
         let playerWhoWriteTheProposition = currentGame._actualPlayer;
         let validWord = false;

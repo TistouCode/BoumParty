@@ -94,13 +94,19 @@ inputProposition.addEventListener('keydown', function(event) {
     if (!ignoredKeys.includes(event.key)) {
         socket.emit('typing', event.key)
     }
-
-
-
-
 });
 
+socket.on('deleteActualPropositionOnTheInput', (playerUuid) => {
+    console.log("SON UUID : ", playerUuid)
+    let actualPlayerProposition = document.getElementById(`${playerUuid}-proposition`);
+    console.log("BALISE : ", actualPlayerProposition)
+    actualPlayerProposition.textContent = "";
+
+})
+
+
 socket.on('typingKey', (data ) => { // data = [playerUuid, key]
+
     console.log("TYPING : ", data[0])
     let playerUuid = data[0];
     let key = data[1];
@@ -139,7 +145,8 @@ socket.on('word', (dataWord) => { // dataWord = [proposition, validWord, playerU
         playerPropositionElement.textContent = proposition;
         playerPropositionElement.classList.remove("text-red-500")
         playerPropositionElement.classList.add("text-green-500")
-
+        const wordsOkAudio = document.getElementById("wordsOkAudio");
+        wordsOkAudio.play();
 
 
         const li = document.createElement('li');
