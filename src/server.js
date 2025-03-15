@@ -192,6 +192,13 @@ io.on('connection', (socket) => {
 
     })
 
+    socket.on('typing', (key) => {
+        console.log("KEY : ", key)
+        io.to(gameId).emit('typingKey', [currentGame._actualPlayer.uuid, key]);
+    })
+
+
+
     // Gérer la déconnexion
     socket.on('disconnect', () => {
         console.log(`${pseudonyme} s'est déconnecté`);

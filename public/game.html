@@ -87,27 +87,27 @@
         }
     </style>
 </head>
-<body style="background-color: var(--dark); color: var(--text-primary);" class="h-full w-full flex justify-center items-center">
+<body style="background-color: var(--dark); color: var(--text-primary);" class="flex justify-center items-center ">
 
-<div class="flex flex-col rounded-2xl w-4/5 md:w-3/5 lg:w-1/2 h-full m-5 shadow-2xl overflow-hidden" style="background-color: var(--dark-mid); border: 1px solid var(--primary-dark);">
+<div class="flex flex-col rounded-2xl w-4/5 md:w-3/5 lg:w-1/2 h-full m-1 shadow-2xl overflow-hidden" style="background-color: var(--dark-mid); border: 1px solid var(--primary-dark);">
 
 
-    <header class="p-2 flex justify-center items-center" style="background-color: var(--dark);">
-        <h1 class="text-4xl font-bold" style="color: var(--primary-light);">
-            <span class="mr-2">🎮</span> BoumParty <span class="ml-2">💣</span>
+    <header class="flex justify-center items-center" style="background-color: var(--dark);">
+        <h1 class="text-3xl font-bold" style="color: var(--primary-light);">
+            <span class="mr-2">💣</span> BoumParty <span class="ml-2">💣</span>
         </h1>
     </header>
 
     <div id="divPlayer" class="w-full flex-1 flex justify-center items-center flex-col p-3 relative">
 
-        <div class="mb-8 w-full">
-            <p id="sequence" class="text-3xl p-3 rounded-2xl text-center font-medium glass-effect" style="color: var(--text-primary);"></p>
+        <div class="mb-4 w-full">
+            <p id="sequence" class="text-3xl p-2 rounded-2xl text-center font-medium glass-effect" style="color: var(--text-primary);"></p>
         </div>
 
         <h2 class="text-2xl font-semibold mb-2" style="color: var(--primary-light);">Joueurs</h2>
 
-        <div class="w-full mb-2">
-            <ul id="userList" class="flex flex-wrap justify-center gap-4 p-3">
+        <div class="w-full mb-1">
+            <ul id="userList" class="flex flex-wrap justify-center gap-4 p-2">
                 <!-- Les joueurs seront ajoutés dynamiquement ici -->
             </ul>
         </div>
@@ -116,13 +116,26 @@
         <div id="bomb" class="text-4xl rounded-full w-20 h-20 flex justify-center items-center font-bold bomb-animation z-10" style="background-color: var(--accent);">💣</div>
     </div>
 
-    <div class="p-5" style="background-color: var(--dark);">
-        <input type="text" id="inputProposition" autocomplete="off" class="w-full p-4 rounded-lg text-lg" style="background-color: var(--dark-light); color: var(--text-primary); border: 1px solid var(--primary-dark); outline: none;"
+    <div class="p-1" style="background-color: var(--dark);">
+        <input type="text" id="inputProposition" autocomplete="off" class="w-full p-2 rounded-lg text-lg" style="background-color: var(--dark-light); color: var(--text-primary); border: 1px solid var(--primary-dark); outline: none;"
                placeholder="Tapez quelque chose..." disabled>
     </div>
 
-</div>
 
+</div>
+<div class="w-52 p-1 bg-gray-800 rounded-lg shadow-lg flex items-center gap-4">
+    <!-- Icône Volume -->
+    <span id="volumeIcon" class="text-xl">🔊</span>
+
+    <!-- Barre de volume -->
+    <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="1"
+           class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+
+    <!-- Affichage du pourcentage -->
+    <span id="volumePercentage" class="text-sm">100%</span>
+
+</div>
+<audio src="../assets/audio/bombe_explosion.mp3" id="bombExplosionAudio" class="audio hidden"></audio>
 <script src="../socket.io/socket.io.js"></script>
 <script src="../assets/js/app.js"></script>
 </body>

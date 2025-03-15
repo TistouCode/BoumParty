@@ -20,6 +20,37 @@ let userList = document.getElementById('userList');
 let tabUsers = []
 let timer = document.getElementById('timer');
 
+const volumeSlider = document.getElementById("volumeSlider");
+const volumeIcon = document.getElementById("volumeIcon");
+const volumePercentage = document.getElementById("volumePercentage");
+
+// Fonction pour mettre à jour le volume de tous les médias
+function updateVolume(volume) {
+    document.querySelectorAll("audio, video").forEach(media => {
+        media.volume = volume;
+    });
+
+    volumePercentage.textContent = Math.round(volume * 100) + "%";
+    console.log(volume)
+    // Changer l’icône en fonction du volume
+    if (volume == 0) {
+        volumeIcon.textContent = "🔇"; // Muet
+    } else if (volume < 0.5) {
+        volumeIcon.textContent = "🔉"; // Volume bas
+    } else {
+        volumeIcon.textContent = "🔊"; // Volume normal
+    }
+}
+
+// Écouteur sur la barre de volume
+volumeSlider.addEventListener("input", () => {
+    updateVolume(volumeSlider.value);
+});
+
+// Appliquer le volume au chargement de la page
+updateVolume(volumeSlider.value);
+
+
 socket.on('game-start', () => {
     console.log('La partie commence !');
     timer.classList.add('hidden');
@@ -32,7 +63,21 @@ inputProposition.addEventListener('keydown', function(event) {
         socket.emit('proposition', proposition);
         inputProposition.value = '';
     }
+    console.log("event : ", event.key)
+    socket.emit('typing', event.key)
+
+
 });
+
+socket.on('typingKey', (data ) => { // data = [playerUuid, key]
+    console.log("TYPING : ", data[0])
+    let playerUuid = data[0];
+    let key = data[1];
+    let propositionPlayerInLive = document.getElementById(`${playerUuid}-proposition`);
+    console.log(propositionPlayerInLive)
+    console.log("UUID / ", playerUuid)
+    propositionPlayerInLive.textContent += key;
+})
 
 socket.on('pre-game-timer', (timeLeft) => {
     timer.textContent = timeLeft;
@@ -61,6 +106,12 @@ socket.on('word', (word) => {
         playerPropositionElement.classList.add("text-red-500")
     }
 })
+
+
+
+
+
+
 
 socket.on('user-list', (players) => {
     let playerListElement = document.getElementById("userList");
@@ -136,6 +187,8 @@ socket.on('user-list', (players) => {
 
 // Signal reçu lorsqu'un joueur a perdu une vie
 socket.on('boum', (player)=>{
+    const bombExplosionAudio = document.getElementById("bombExplosionAudio");
+    bombExplosionAudio.play();
     let playerElement = document.getElementById(player.uuid);
     console.log("PLAYER ELEMENT", playerElement.children)
     let heartList = document.getElementById(`${player.uuid}-lives`);
@@ -154,15 +207,12 @@ socket.on('boum', (player)=>{
 // Stocker le joueur actif
 let currentActualPlayerUuid = null;
 socket.on('actual-player', (playerUuid) => {
-    // console.log("UUID reçu :", playerUuid);
-    // currentActualPlayerToken = playerData.token;:
     updateActualPlayer(playerUuid);
 });
-const currentUserUuid = token;
+
 function updateActualPlayer(playerUuid) {
     let players = document.querySelectorAll('.player');
     let playerName = document.getElementById(`${playerUuid}-name`);
-    console.log("TOKENJOEUUR", currentUserUuid)
     console.log("PLAYERUUID", playerUuid)
     players.forEach(player => {
         // On enlève le style rouge et gras à tous les joueurs
@@ -172,12 +222,6 @@ function updateActualPlayer(playerUuid) {
     });
 
     let actualPlayer = document.getElementById(playerUuid);
-
-    // if (playerUuid === currentUserUuid) {
-    //     inputProposition.disabled = false;
-    // } else {
-    //     inputProposition.disabled = true;
-    // }
 
     if (actualPlayer) {
         playerName.classList.add("text-red-500", "font-bold");
