@@ -50,7 +50,17 @@ volumeSlider.addEventListener("input", () => {
 // Appliquer le volume au chargement de la page
 updateVolume(volumeSlider.value);
 
+document.getElementById('bombExplosionAudio').addEventListener('play', function() {
+    const bomb = document.getElementById('bomb');
 
+    bomb.classList.add('explode');
+
+    setTimeout(() => {
+        bomb.classList.remove('explode');
+        bomb.classList.add('reappear');
+    }, 1000);
+    bomb.classList.remove('reappear');
+});
 socket.on('game-start', () => {
     console.log('La partie commence !');
     timer.classList.add('hidden');

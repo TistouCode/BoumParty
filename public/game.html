@@ -85,10 +85,49 @@
             animation: activePlayerAnimation 1.5s infinite;
             border: 2px solid var(--accent);
         }
+
+        @keyframes explosion {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(3);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        @keyframes reappear {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .explode {
+            animation: explosion 1s ease-out forwards;
+        }
+
+        .reappear {
+            animation: reappear 1s ease-in forwards;
+        }
+
     </style>
 </head>
 <body style="background-color: var(--dark); color: var(--text-primary);" class="flex justify-center items-center ">
-
+<div id="overlay" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md z-50">
+    <p id="countdown" class="text-4xl font-bold text-white">Début de partie dans</p>
+    <span id="timeLeftBeforeGo"></span>
+</div>
+<div id="flashOverlay" class="fixed top-0 left-0 w-full h-full hidden bg-red-500 z-50"></div>
 <div class="flex flex-col rounded-2xl w-4/5 md:w-3/5 lg:w-1/2 h-full m-1 shadow-2xl overflow-hidden" style="background-color: var(--dark-mid); border: 1px solid var(--primary-dark);">
 
 
@@ -113,7 +152,7 @@
         </div>
 
         <h2 id="timer" class="text-3xl font-bold px-4 py-2 rounded-full timer-pulse" style="background-color: var(--dark); color: var(--accent); border: 2px solid var(--accent-dark);"></h2>
-        <div id="bomb" class="text-4xl rounded-full w-20 h-20 flex justify-center items-center font-bold bomb-animation z-10" style="background-color: var(--accent);">💣</div>
+        <div id="bomb" class="text-4xl rounded-full w-16 h-16 flex justify-center items-center font-bold bomb-animation z-10" style="background-color: var(--accent);">💣</div>
     </div>
 
     <div class="p-1" style="background-color: var(--dark);">
@@ -123,7 +162,7 @@
 
 
 </div>
-<div class="w-52 p-1 bg-gray-800 rounded-lg shadow-lg flex items-center gap-4">
+<div class="w-52 p-1 bg-gray-800 rounded-lg shadow-lg flex items-center gap-4 absolute bottom-2 right-2">
     <!-- Icône Volume -->
     <span id="volumeIcon" class="text-xl">🔊</span>
 
