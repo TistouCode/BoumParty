@@ -54,23 +54,11 @@
             animation: timerGlow 2s infinite alternate;
         }
 
-        @keyframes timerGlow {
-            from { box-shadow: 0 0 5px rgba(255, 94, 125, 0.5); }
-            to { box-shadow: 0 0 15px rgba(255, 94, 125, 0.8); }
-        }
-
-        .glass-effect {
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            background-color: rgba(48, 48, 77, 0.5);
-            border: 1px solid rgba(108, 99, 255, 0.2);
-        }
-
-        /* Assure que l'input désactivé a tout de même un style élégant */
-        input:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
+        /*!* Assure que l'input désactivé a tout de même un style élégant *!*/
+        /*input:disabled {*/
+        /*    opacity: 0.7;*/
+        /*    cursor: not-allowed;*/
+        /*}*/
 
         /* Animation de couleur pour le joueur actif */
         @keyframes activePlayerAnimation {
@@ -122,33 +110,28 @@
 
     </style>
 </head>
-<body style="background-color: var(--dark); color: var(--text-primary);" class="flex justify-center items-center ">
+<body class="flex justify-center items-center bg-night-base">
 <div id="pregameOverlay" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md z-50">
     <p id="preGameTimer" class="text-4xl font-bold text-white">Début de partie dans</p>
 </div>
-<div id="flashOverlay" class="fixed top-0 left-0 w-full h-full hidden bg-red-500 z-50"></div>
-<div class="flex flex-col rounded-2xl w-4/5 md:w-3/5 lg:w-1/2 h-full m-1 shadow-2xl overflow-hidden" style="background-color: var(--dark-mid); border: 1px solid var(--primary-dark);">
+
+<div class="flex flex-col rounded-2xl w-4/5 md:w-3/5 lg:w-1/2 h-full m-1 overflow-hidden " >
     <div id="divPlayer" class="w-full flex-1 flex justify-center items-center flex-col p-3 relative">
 
         <div class="mb-4 w-full">
-            <p id="sequence" class="text-3xl p-2 rounded-2xl text-center font-medium glass-effect" style="color: var(--text-primary);"></p>
+            <p id="sequence" class="text-3xl p-2 rounded-2xl text-center font-medium text-lavender-blush-base"></p>
         </div>
-
-        <h2 class="text-2xl font-semibold mb-2" style="color: var(--primary-light);">Joueurs</h2>
-
         <div class="w-full mb-1">
             <ul id="userList" class="flex flex-wrap justify-center gap-4 p-2">
                 <!-- Les joueurs seront ajoutés dynamiquement ici -->
             </ul>
         </div>
 
-        <h2 id="timer" class="text-3xl font-bold px-4 py-2 rounded-full timer-pulse" style="background-color: var(--dark); color: var(--accent); border: 2px solid var(--accent-dark);"></h2>
         <div id="bomb" class="text-4xl rounded-full w-16 h-16 flex justify-center items-center font-bold bomb-animation z-10" style="background-color: var(--accent);">💣</div>
     </div>
 
-    <div class="p-1" style="background-color: var(--dark);">
-        <input type="text" id="inputProposition" autocomplete="off" class="w-full p-2 rounded-lg text-lg" style="background-color: var(--dark-light); color: var(--text-primary); border: 1px solid var(--primary-dark); outline: none;"
-               placeholder="Tapez quelque chose..." disabled>
+    <div class="p-1">
+        <input type="text" id="inputProposition" autocomplete="off" class="w-full p-2 rounded-lg text-lg disabled:cursor-not-allowed bg-night-2 outline-none" placeholder="Tapez quelque chose..." disabled>
     </div>
 
 
@@ -159,7 +142,7 @@
 
     <!-- Barre de volume -->
     <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="1"
-           class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+           class="w-full h-2 bg-gray-700 rounded-lg appearance-none  disabled:opacity-50">
 
     <!-- Affichage du pourcentage -->
     <span id="volumePercentage" class="text-sm">100%</span>
@@ -184,6 +167,31 @@
             <!-- Les mots du dictionnaire seront ajoutés dynamiquement ici -->
         </ul>
     </div>
+</div>
+<!-- Barre latérale -->
+<div class="w-32 h-screen bg-night-1 border-r border-gray-200 fixed left-0 top-0 overflow-y-auto p-2">
+    <ul class="list-none p-0 m-0 flex flex-col flex-wrap max-h-full">
+        <li id="a" class="letter m-1 p-1 rounded text-center cursor-pointer bg-lavender-blush-1">a</li>
+        <li id="b" class="letter m-1 p-1 rounded text-center cursor-pointer bg-lavender-blush-1">b</li>
+        <li id="c" class="letter m-1 p-1 rounded text-center cursor-pointer bg-lavender-blush-1">c</li>
+        <li id="d" class="letter m-1 p-1 rounded text-center cursor-pointer bg-lavender-blush-1">d</li>
+        <li id="e" class="letter m-1 p-1 rounded text-center cursor-pointer bg-lavender-blush-1">e</li>
+        <li id="f" class="letter m-1 p-1 rounded text-center cursor-pointer bg-lavender-blush-1">f</li>
+        <li id="g" class="letter m-1 p-1 rounded text-center cursor-pointer bg-lavender-blush-1">g</li>
+        <li id="h" class="letter m-1 p-1 rounded text-center cursor-pointer bg-lavender-blush-1">h</li>
+        <li id="i" class="letter m-1 p-1 rounded text-center cursor-pointer bg-lavender-blush-1">i</li>
+        <li id="j" class="letter m-1 p-1 rounded text-center cursor-pointer bg-lavender-blush-1">j</li>
+        <li id="k" class="letter m-1 p-1 rounded text-center cursor-pointer bg-lavender-blush-1">k</li>
+        <li id="l" class="letter m-1 p-1 rounded text-center cursor-pointer bg-lavender-blush-1">l</li>
+        <li id="m" class="letter m-1 p-1 rounded text-center cursor-pointer bg-lavender-blush-1">m</li>
+        <li id="n" class="letter m-1 p-1 rounded text-center cursor-pointer bg-lavender-blush-1">n</li>
+        <li id="o" class="letter m-1 p-1 rounded text-center cursor-pointer bg-lavender-blush-1">o</li>
+        <li id="p" class="letter m-1 p-1 rounded text-center cursor-pointer bg-lavender-blush-1">p</li>
+        <li id="q" class="letter m-1 p-1 rounded text-center cursor-pointer bg-lavender-blush-1">q</li>
+        <li id="r" class="letter m-1 p-1 rounded text-center cursor-pointer bg-lavender-blush-1">r</li>
+
+
+    </ul>
 </div>
 
 <audio src="../assets/audio/bombe_explosion.mp3" id="bombExplosionAudio" class="audio hidden"></audio>

@@ -18,7 +18,7 @@ const socket = io(
 let divPlayer = document.getElementById('divPlayer');
 let userList = document.getElementById('userList');
 let tabUsers = []
-let timer = document.getElementById('timer');
+// let timer = document.getElementById('timer');
 let dicoWords = document.getElementById('dicoWords');
 
 
@@ -76,7 +76,7 @@ closeButton.addEventListener('click', () => {
 
 socket.on('game-start', () => {
     console.log('La partie commence !');
-    timer.classList.add('hidden');
+    // timer.classList.add('hidden');
 });
 const ignoredKeys = [
     'Enter', 'Control', 'Shift', 'Alt', 'Tab', 'CapsLock', 'Escape', 'ArrowLeft', 'ArrowRight',
@@ -96,15 +96,6 @@ inputProposition.addEventListener('keydown', function(event) {
         socket.emit('typing', event.key)
     }
 });
-
-// socket.on('deleteActualPropositionOnTheInput', (playerUuid) => {
-//     console.log("SON UUID : ", playerUuid)
-//     let actualPlayerProposition = document.getElementById(`${playerUuid}-proposition`);
-//     console.log("PROPOSITION AVANT SUPPRESSION: ", actualPlayerProposition.textContent)
-//     actualPlayerProposition.textContent = "";
-//     console.log("PROPOSITION LORS DE SUPPRESSION: ", actualPlayerProposition.textContent)
-// })
-
 
 socket.on('typingKey', (data) => { // data = [playerUuid, key]
 
@@ -218,23 +209,19 @@ socket.on('user-list', (gameData) => {
             "flex",
             "flex-col",
             "items-center",
-            "w-32"
+            "w-32",
+            "bg-night-2"
         );
-        playerElt.style = "background-color: var(--dark-light)";
 
         // Créer l'avatar (cercle avec initiale)
         let playerAvatar = document.createElement("div");
         playerAvatar.classList.add("w-14", "h-14", "rounded-full", "flex", "items-center", "justify-center", "text-xl", "font-bold", "mb-2");
-        playerAvatar.style.backgroundColor = "var(--primary)";
         playerAvatar.textContent = player[0].charAt(0).toUpperCase(); // Première lettre du nom
 
         let playerName = document.createElement("span");
         playerName.id = `${player[1].uuid}-name`;
         playerName.textContent = player[0];
-        playerName.classList.add(
-            "font-medium"
-        )
-        playerName.style = "color: var(--text-secondary)";
+        playerName.classList.add("font-medium", "text-lavender-blush-base")
 
         // Affichage des vies sous forme de cœurs
         let heartList = document.createElement("ul");
@@ -275,6 +262,10 @@ socket.on('user-list', (gameData) => {
 });
 
 
+
+
+
+
 // Signal reçu lorsqu'un joueur a perdu une vie
 socket.on('boum', (player)=>{
     const bomb = document.getElementById('bomb');
@@ -306,6 +297,7 @@ socket.on('boum', (player)=>{
 let currentActualPlayerUuid = null;
 socket.on('actual-player', (dataPlayer) => { // dataPlayer = {uuid, life}
     updateActualPlayer(dataPlayer.uuid);
+    console.log("CLIENT j'ai le socket id : ", socket.id)
 });
 
 function updateActualPlayer(playerUuid) {
@@ -356,8 +348,28 @@ socket.on('sequence', (seq) => {
     sequence.textContent = seq;
 })
 
-socket.on('timer', (time) => {
-    timer.textContent = time;
+// socket.on('timer', (time) => {
+//     timer.textContent = time;
+// })
+
+
+
+let clientLettersUsed = document.querySelectorAll('.letter');
+clientLettersUsed.forEach((letter)=>{
+    console.log(letter.id)
+})
+console.log("LETTERS USED : ", clientLettersUsed)
+socket.on('lettersUsedByActualPlayer', (data) => { // data = {playerUuid, tabUsedLetters}
+    let playerUuid = data.playerUuid;
+    let tabUsedLetters = data.tabUsedLetters;
+    console.log("LETTERS USED CLIENT : ", tabUsedLetters)
+    clientLettersUsed.forEach((letter)=>{
+        console.log(letter.id)
+        if(tabUsedLetters.includes(letter.id)){
+            document.getElementById(`${letter.id}`).classList.add('bg-night-2')
+        }
+    })
+
 })
 
 socket.on('bonus-life', (playerUuid) => {
@@ -366,6 +378,14 @@ socket.on('bonus-life', (playerUuid) => {
     heart.textContent = "❤️";
     heart.classList.add("text-sm");
     heartList.appendChild(heart);
+
+    clientLettersUsed.forEach((letter)=>{
+        console.log(letter.id)
+        if(tabUsedLetters.includes(letter.id)){
+            document.getElementById(`${letter.id}`).classList.remove('bg-night-2')
+            document.getElementById(`${letter.id}`).classList.add('bg-lavender-blush-1')
+        }
+    })
 })
 
 

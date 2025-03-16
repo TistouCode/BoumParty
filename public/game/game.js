@@ -3,7 +3,7 @@ import config from '../../config.json' with {type: 'json'};
 import frenchWords from 'an-array-of-french-words/index.json' with {type: 'json'};
 import sequencesTab from '../assets/sequences.json' with { type: 'json' };
 let indexJoueur = Math.floor(Math.random() * 1000) % 3;
-const lettersComplet = ['e']
+const lettersComplet = ['a', 'b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v']
 
 
 
@@ -68,6 +68,7 @@ export class Boum {
             live: true,
             actualWord: '',
             usedLetters: [],
+            socketId: null
         });
     }
 
@@ -159,7 +160,9 @@ export class Boum {
                 clearInterval(preGameInterval);
 
                 this.defineFirstPlayer()
+
                 this.switchPlayer(io, gameId);
+
                 this._actualPlayer.play = true;
                 io.to(gameId).emit('game-start');
                 io.to(gameId).emit('actual-player', {
@@ -185,11 +188,12 @@ export class Boum {
             this._interval = setInterval(() => {
 
                 this._timeLeft--;
-                console.log("LETTERS USED: ", this._actualPlayer.usedLetters)
+                // console.log("LETTERS USED: ", this._actualPlayer.usedLetters)
                 // CHRONO
                 io.to(gameId).emit('timer', this._timeLeft);
                 if (this._timeLeft === 0) {
                     this._actualPlayer.life--;
+
                     if (this._actualPlayer.life <= 0) {
                         // Supprimer le joueur de _scores par son username
                         this._actualPlayer.live = false;
@@ -205,6 +209,7 @@ export class Boum {
                     }
                     io.to(gameId).emit('boum', this._actualPlayer);
                     this.switchPlayer(io, gameId);
+                    console.log("SOCKET JOUEUR ACTUEL : ", this._actualPlayer.socketId)
                     this._timeLeft = this._bombDuration;
                     io.to(gameId).emit('sequence', this._currentSequence);
                 }
@@ -418,6 +423,10 @@ export class Boum {
                 let lettreNonConforme = ['w', 'x', 'y', 'z']
                 if(!lettreNonConforme.includes(lettre)){
                     this._actualPlayer.usedLetters.push(lettre);
+                    io.to(this._currentPlayerSocketId).emit('lettersUsedByActualPlayer', {
+                        playerUuid: this._actualPlayer.uuid,
+                        tabUsedLetters: this._actualPlayer.usedLetters
+                    });
                 }
                 if(this.verifCorrespondanceLetters(this._actualPlayer.usedLetters, lettersComplet)){
                     console.log("BONUS DE VIE")

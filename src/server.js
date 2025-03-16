@@ -143,6 +143,8 @@ io.on('connection', (socket) => {
     socket.username = pseudonyme;
     socket.emit('join', pseudonyme);
 
+
+
     io.to(gameId).emit('user-list', {
         tabPlayers: Array.from(currentGame._scores),
         inGame: currentGame._inGame
@@ -160,12 +162,6 @@ io.on('connection', (socket) => {
 
     // Lancer la partie uniquement si elle n'est pas en cours
     currentGame.startGame(io, gameId);
-    // Envoyer le mot à tous les clients
-
-
-    // socket.on('deleteActualPropositionOnTheInput', () => {
-    //     io.to(gameId).emit('deleteActualPropositionOnTheInput', currentGame._actualPlayer.uuid);
-    // })
 
     // Gérer les propositions de mots
     socket.on('proposition', async (proposition) => {
