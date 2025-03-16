@@ -210,7 +210,8 @@ socket.on('user-list', (gameData) => {
             "flex-col",
             "items-center",
             "w-32",
-            "bg-night-2"
+            "bg-night-2",
+            "text-lavender-blush-base"
         );
 
         // Créer l'avatar (cercle avec initiale)
@@ -381,10 +382,10 @@ socket.on('bonus-life', (playerUuid) => {
 
     clientLettersUsed.forEach((letter)=>{
         console.log(letter.id)
-        if(tabUsedLetters.includes(letter.id)){
-            document.getElementById(`${letter.id}`).classList.remove('bg-night-2')
-            document.getElementById(`${letter.id}`).classList.add('bg-lavender-blush-1')
-        }
+
+        document.getElementById(`${letter.id}`).classList.remove('bg-night-2')
+        document.getElementById(`${letter.id}`).classList.add('bg-lavender-blush-1')
+
     })
 })
 
@@ -404,12 +405,10 @@ socket.on('game-over', (winner) => {
 
     // Créer un message de victoire
     let victoryMessage = document.createElement("div");
-    victoryMessage.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "flex", "justify-center", "items-center", "z-20");
-    victoryMessage.style.backgroundColor = "rgba(26, 26, 46, 0.8)";
+    victoryMessage.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "flex", "justify-center", "items-center", "z-20", "text-lavender-blush-base");
 
     let messageContent = document.createElement("div");
     messageContent.classList.add("text-4xl", "font-bold", "p-8", "rounded-xl", "text-center");
-    messageContent.style.color = "var(--primary-light)";
     messageContent.innerHTML = `🎉 ${document.getElementById(`${winner.uuid}-name`).textContent} a gagné ! 🎉`;
 
     victoryMessage.appendChild(messageContent);

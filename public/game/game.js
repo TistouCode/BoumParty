@@ -3,7 +3,7 @@ import config from '../../config.json' with {type: 'json'};
 import frenchWords from 'an-array-of-french-words/index.json' with {type: 'json'};
 import sequencesTab from '../assets/sequences.json' with { type: 'json' };
 let indexJoueur = Math.floor(Math.random() * 1000) % 3;
-const lettersComplet = ['a', 'b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v']
+// const lettersComplet = ['a', 'b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v']
 
 
 
@@ -393,54 +393,69 @@ export class Boum {
     //     return true;
     // }
 
-    verifCorrespondanceLetters(lettersPlayer, lettersComplet){
-        let res = false
-        lettersPlayer.forEach((letter) => {
-            if(lettersComplet.includes(letter)){
-                res = true
-            }else{
-                res = false
+    /**
+     * Vérifie si toutes les lettres du joueur sont incluses dans le tableau de référence
+     * @param {Array} lettersPlayer - Tableau des lettres du joueur
+     * @param {Array} lettersComplet - Tableau de référence contenant toutes les lettres valides
+     * @returns {boolean} - Vrai si toutes les lettres du joueur sont incluses dans le tableau de référence
+     */
+    verifCorrespondanceLetters(lettersPlayer, lettersComplet) {
+        // Vérifier que chaque lettre du joueur est dans le tableau de référence
+        for (let i = 0; i < lettersPlayer.length; i++) {
+            if (!lettersComplet.includes(lettersPlayer[i])) {
+                return false; // Si une lettre n'est pas incluse, retourner false immédiatement
             }
-        })
-        return res
+        }
+        return true; // Toutes les lettres sont incluses
     }
 
     /**
-     * Fonction qui prend un mot et retourne un tableau contenant
-     * chaque lettre unique (sans doublons)
+     * Fonction qui prend un mot et ajoute chaque lettre unique au tableau du joueur
      * @param {string} mot - Le mot à traiter
+     * @param {object} io - Instance de Socket.IO
+     * @param {string} gameId - ID de la partie
      */
     addLettresUniques(mot, io, gameId) {
-        // Parcourir chaque caractère du mot
-        console.log("DANS ADDLETTRESUNIQUES : ", mot)
+        console.log("DANS ADDLETTRESUNIQUES : ", mot);
 
+        // Tableau des lettres non conformes
+        const lettreNonConforme = ['w', 'x', 'y', 'z'];
+
+        // Définir lettersComplet
+        const lettersComplet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v'];
+
+        // Variable pour suivre si une nouvelle lettre a été ajoutée
+        let nouvelleLettre = false;
+
+        // Parcourir chaque caractère du mot
         for (let i = 0; i < mot.length; i++) {
             const lettre = mot[i];
 
-            // Vérifier si la lettre n'est pas déjà dans le tableau
-            if (!this._actualPlayer.usedLetters.includes(lettre)) {
-                // Ajouter la lettre au tableau si elle n'y est pas déjà
-                let lettreNonConforme = ['w', 'x', 'y', 'z']
-                if(!lettreNonConforme.includes(lettre)){
-                    this._actualPlayer.usedLetters.push(lettre);
-                    io.to(this._currentPlayerSocketId).emit('lettersUsedByActualPlayer', {
-                        playerUuid: this._actualPlayer.uuid,
-                        tabUsedLetters: this._actualPlayer.usedLetters
-                    });
-                }
-                if(this.verifCorrespondanceLetters(this._actualPlayer.usedLetters, lettersComplet)){
-                    console.log("BONUS DE VIE")
-                    this._actualPlayer.life++
-                    io.to(gameId).emit('bonus-life', this._actualPlayer.uuid);
-                    this._actualPlayer.usedLetters = []
-                    return
-                }else{
-                    console.log("PAS DE BONUS DE VIE")
-                }
+            // Vérifier si la lettre est conforme et pas déjà dans le tableau
+            if (!lettreNonConforme.includes(lettre) && !this._actualPlayer.usedLetters.includes(lettre)) {
+                // Ajouter la lettre au tableau
+                this._actualPlayer.usedLetters.push(lettre);
+                nouvelleLettre = true;
+            }
+        }
 
-                // console.log("RESULAT DE LA COMPARAISON : ", this.toutesLettresIncluses(this._actualPlayer.usedLetters, lettersComplet))
+        // Envoyer la mise à jour uniquement si une nouvelle lettre a été ajoutée
+        if (nouvelleLettre) {
+            io.to(this._currentPlayerSocketId).emit('lettersUsedByActualPlayer', {
+                playerUuid: this._actualPlayer.uuid,
+                tabUsedLetters: this._actualPlayer.usedLetters
+            });
 
+            // Vérifier si le joueur a collecté toutes les lettres requises
+            if (this.verifCorrespondanceLetters(lettersComplet, this._actualPlayer.usedLetters)) {
+                console.log("BONUS DE VIE");
+                this._actualPlayer.life++;
+                io.to(gameId).emit('bonus-life', this._actualPlayer.uuid);
+                this._actualPlayer.usedLetters = [];
+            } else {
+                console.log("PAS DE BONUS DE VIE");
+            }
         }
     }
-}
+
 }
