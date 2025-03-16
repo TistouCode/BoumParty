@@ -121,7 +121,7 @@ io.on('connection', (socket) => {
     const gameId = socket.handshake.query.gameId;
     const token = socket.handshake.query.token;
 
-    if(!games.has(gameId)){
+    if (!games.has(gameId)) {
         console.log("game not found")
         return;
     }
@@ -143,11 +143,15 @@ io.on('connection', (socket) => {
     socket.username = pseudonyme;
     socket.emit('join', pseudonyme);
 
-    io.to(gameId).emit('user-list', Array.from(currentGame._scores));
+    io.to(gameId).emit('user-list', {
+        tabPlayers: Array.from(currentGame._scores),
+        inGame: currentGame._inGame
+    });
+
 
     // Envoyer immédiatement l'état du joueur actuel au nouvel utilisateur
     if (currentGame._actualPlayer) {
-        socket.emit('actual-player', currentGame._actualPlayer.token);
+        socket.emit('actual-player', currentGame._actualPlayer.uuid);
         socket.emit('sequence', currentGame._currentSequence);
         socket.emit('timer', currentGame._timeLeft);
         socket.emit('word', currentGame._actualPlayer.actualWord);
@@ -174,7 +178,7 @@ io.on('connection', (socket) => {
         // Vérifier si le mot est valide
         currentGame._actualPlayer._alreadyPutAProposition = true;
         // resProposition = [bool, natureWord, URlWord]
-        let resProposition = await currentGame.isValidWord(proposition, currentGame._currentSequence, currentGame._usedWords);
+        let resProposition = await currentGame.isValidWord(proposition, currentGame._currentSequence, currentGame._usedWords, io, gameId);
         console.log(resProposition);
         if (resProposition[0]) {
 
@@ -182,7 +186,6 @@ io.on('connection', (socket) => {
             currentGame._usedWords.push(proposition);
             currentGame._timeLeft += 3;
             // Ajouter le mot au joueur actif
-            // currentGame._scores.get(currentGame._actualPlayer.username).words.push(proposition);
             validWord = true;
             // Changer de joueur
             console.log("JE RENVOIE A l'USER : ", [proposition, validWord, playerWhoWriteTheProposition.uuid, resProposition[1], resProposition[2]])
@@ -221,7 +224,11 @@ io.on('connection', (socket) => {
         }
 
         // Informer les autres joueurs
-        io.to(gameId).emit('user-list', Array.from(currentGame._scores));
+        io.to(gameId).emit('user-list', {
+            tabPlayers: Array.from(currentGame._scores),
+            inGame: currentGame._inGame
+
+        });
 
         // NE PAS CHANGER DE JOUEUR ACTIF
         console.log("Le joueur reste actif même après sa déconnexion.");

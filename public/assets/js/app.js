@@ -154,7 +154,7 @@ socket.on('word', (dataWord) => { // dataWord = [proposition, validWord, playerU
 
 
         const li = document.createElement('li');
-        li.classList.add('p-2', 'bg-white', 'rounded-lg', 'shadow-md', 'hover:bg-gray-100', 'transition-all', 'space-y-2', 'h-32');
+        li.classList.add('p-2', 'bg-white', 'rounded-lg', 'shadow-md', 'hover:bg-gray-100', 'transition-all', 'space-y-2');
 
         // Création du texte du mot et de sa nature
         const wordText = document.createElement('p');
@@ -199,10 +199,14 @@ socket.on('word', (dataWord) => { // dataWord = [proposition, validWord, playerU
 
 
 
-socket.on('user-list', (players) => {
+socket.on('user-list', (gameData) => {
+    let players = gameData.tabPlayers;
+    let inGame = gameData.inGame;
     let playerListElement = document.getElementById("userList");
     playerListElement.innerHTML = ""; // On vide la liste avant de la recharger
-
+    if(inGame){
+        pregameOverlay.classList.add('hidden');
+    }
     players.forEach(player => {
         let playerElt = document.createElement("li");
         playerElt.id = player[1].uuid;    // On met le uuid en id pour identifier chaque joueur
@@ -300,8 +304,8 @@ socket.on('boum', (player)=>{
 
 // Stocker le joueur actif
 let currentActualPlayerUuid = null;
-socket.on('actual-player', (playerUuid) => {
-    updateActualPlayer(playerUuid);
+socket.on('actual-player', (dataPlayer) => { // dataPlayer = {uuid, life}
+    updateActualPlayer(dataPlayer.uuid);
 });
 
 function updateActualPlayer(playerUuid) {
@@ -355,6 +359,15 @@ socket.on('sequence', (seq) => {
 socket.on('timer', (time) => {
     timer.textContent = time;
 })
+
+socket.on('bonus-life', (playerUuid) => {
+    let heartList = document.getElementById(`${playerUuid}-lives`);
+    let heart = document.createElement("li");
+    heart.textContent = "❤️";
+    heart.classList.add("text-sm");
+    heartList.appendChild(heart);
+})
+
 
 socket.on('player-death', (player) => {
     console.log("Joueur mort :", player);

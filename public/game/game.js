@@ -3,6 +3,9 @@ import config from '../../config.json' with {type: 'json'};
 import frenchWords from 'an-array-of-french-words/index.json' with {type: 'json'};
 import sequencesTab from '../assets/sequences.json' with { type: 'json' };
 let indexJoueur = Math.floor(Math.random() * 1000) % 3;
+const lettersComplet = ['e']
+
+
 
 // Fichier game.js
 
@@ -37,6 +40,7 @@ export class Boum {
         this._gameToken = gameToken; // Token de la partie
         this._currentPlayerSocketId = null;
         this._alreadyPutAProposition = false;
+        // this._usedLetters = [];
         // Initialisation des joueurs
         players.forEach(player => this.addPlayer(player));
     }
@@ -63,6 +67,7 @@ export class Boum {
             connected: false,
             live: true,
             actualWord: '',
+            usedLetters: [],
         });
     }
 
@@ -110,7 +115,10 @@ export class Boum {
         if (this._currentPlayerSocketId != null) {
             io.to(this._currentPlayerSocketId).emit('you-are-not-current-player', this._actualPlayer.uuid);
         }
-        io.to(gameId).emit('actual-player', this._actualPlayer.uuid);
+        io.to(gameId).emit('actual-player', {
+            uuid : this._actualPlayer.uuid,
+            life : this._actualPlayer.life
+        });
 
         this._currentPlayerSocketId = this._actualPlayer.socketId
         console.log("Joueur actuel :", this._currentPlayerSocketId);
@@ -154,7 +162,10 @@ export class Boum {
                 this.switchPlayer(io, gameId);
                 this._actualPlayer.play = true;
                 io.to(gameId).emit('game-start');
-                io.to(gameId).emit('actual-player', this._actualPlayer.uuid);
+                io.to(gameId).emit('actual-player', {
+                     uuid: this._actualPlayer.uuid,
+                     life : this._actualPlayer.life
+                });
 
                 this.startTimer(io, gameId);
             }
@@ -174,7 +185,7 @@ export class Boum {
             this._interval = setInterval(() => {
 
                 this._timeLeft--;
-
+                console.log("LETTERS USED: ", this._actualPlayer.usedLetters)
                 // CHRONO
                 io.to(gameId).emit('timer', this._timeLeft);
                 if (this._timeLeft === 0) {
@@ -286,7 +297,7 @@ export class Boum {
      * @param usedWords Mots déjà utilisés
      * @returns {Promise<(boolean|*)[]|boolean>} Renvoie true si le mot est valide, false sinon
      */
-    async isValidWord(word, sequence, usedWords) {
+    async isValidWord(word, sequence, usedWords, io, gameId) {
         word = word.toLowerCase().trim();
         // Vérifier si le mot contient la séquence
         if (sequence) {
@@ -295,7 +306,7 @@ export class Boum {
             }
         }
 
-        let dataVerifMot = await this.verifierMot(word);
+        let dataVerifMot = await this.verifierMot(word, io, gameId);
         if (dataVerifMot[0] === false || dataVerifMot === false) {
             return false
         }
@@ -314,7 +325,7 @@ export class Boum {
      * @returns {Promise<(boolean|*)[]|boolean>} Renvoie true si le mot est correct, false sinon
      */
 
-    async verifierMot(mot) {
+    async verifierMot(mot, io, gameId) {
 
         console.log("HAHAHAHAHAHHAHAH")
 
@@ -342,14 +353,85 @@ export class Boum {
             const result = responseData.result[0];
             let scoreBrut = result.score;
             if (scoreBrut > 0.95) {
+                this.addLettresUniques(mot, io, gameId);
                 return [true, result.nature, result.url];
             }
         }
         if (frenchWords.includes(mot)) {
+            this.addLettresUniques(mot, io, gameId);
             return true
         } else {
             return false
         }
     }
-}
 
+
+    /**
+     * Fonction qui vérifie si toutes les lettres du premier tableau sont incluses dans le deuxième tableau
+     * @param {string[]} tableau1 - Tableau de lettres à vérifier
+     * @param {string[]} tableau2 - Tableau de référence
+     * @returns {boolean} - Vrai si toutes les lettres de tableau1 sont dans tableau2, faux sinon
+     */
+    // toutesLettresIncluses(tableau1, tableau2) {
+    //     // Vérifie chaque lettre du premier tableau
+    //     console.log("TABLEAU1 : ", tableau1)
+    //     console.log("TABLEAU2 : ", tableau2)
+    //     for (let i = 0; i < tableau1.length; i++) {
+    //         // Si une lettre n'est pas dans le deuxième tableau, retourne faux
+    //         if (!tableau2.includes(tableau1[i])) {
+    //             console.log("FAUX")
+    //             return false;
+    //         }
+    //     }
+    //     console.log("VRAI")
+    //     // Si toutes les lettres sont incluses, retourne vrai
+    //     return true;
+    // }
+
+    verifCorrespondanceLetters(lettersPlayer, lettersComplet){
+        let res = false
+        lettersPlayer.forEach((letter) => {
+            if(lettersComplet.includes(letter)){
+                res = true
+            }else{
+                res = false
+            }
+        })
+        return res
+    }
+
+    /**
+     * Fonction qui prend un mot et retourne un tableau contenant
+     * chaque lettre unique (sans doublons)
+     * @param {string} mot - Le mot à traiter
+     */
+    addLettresUniques(mot, io, gameId) {
+        // Parcourir chaque caractère du mot
+        console.log("DANS ADDLETTRESUNIQUES : ", mot)
+
+        for (let i = 0; i < mot.length; i++) {
+            const lettre = mot[i];
+
+            // Vérifier si la lettre n'est pas déjà dans le tableau
+            if (!this._actualPlayer.usedLetters.includes(lettre)) {
+                // Ajouter la lettre au tableau si elle n'y est pas déjà
+                let lettreNonConforme = ['w', 'x', 'y', 'z']
+                if(!lettreNonConforme.includes(lettre)){
+                    this._actualPlayer.usedLetters.push(lettre);
+                }
+                if(this.verifCorrespondanceLetters(this._actualPlayer.usedLetters, lettersComplet)){
+                    console.log("BONUS DE VIE")
+                    this._actualPlayer.life++
+                    io.to(gameId).emit('bonus-life', this._actualPlayer.uuid);
+                    this._actualPlayer.usedLetters = []
+                    return
+                }else{
+                    console.log("PAS DE BONUS DE VIE")
+                }
+
+                // console.log("RESULAT DE LA COMPARAISON : ", this.toutesLettresIncluses(this._actualPlayer.usedLetters, lettersComplet))
+
+        }
+    }
+}
+}
