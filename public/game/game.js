@@ -321,6 +321,25 @@ export class Boum {
         return [true, dataVerifMot[1], dataVerifMot[2]]
     }
 
+    removeAccents(str) {
+        return str.normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/œ/g, "oe")
+            .replace(/æ/g, "ae")
+            .replace(/ç/g, "c");
+    }
+
+    // Fonction de recherche qui ne modifie pas le tableau original
+    searchWord(searchTerm) {
+        const normalizedSearch = removeAccents(searchTerm.toLowerCase());
+
+        return frenchWords.filter(word => {
+            const normalizedWord = removeAccents(word.toLowerCase());
+            return normalizedWord === normalizedSearch;
+        });
+    }
+
+
     /**
      * @brief Vérifie si un mot est correct
      * @details Cette méthode vérifie si un mot est correct en consultant le dictionnaire de l'Académie française
@@ -358,7 +377,11 @@ export class Boum {
         //         return [true, result.nature, result.url];
         //     }
         // }
-        if (frenchWords.includes(mot)) {
+
+
+
+
+        if (this.searchWord(mot).length > 0) {
             this.addLettresUniques(mot, io, gameId);
             return true
         } else {
