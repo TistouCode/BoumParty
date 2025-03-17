@@ -349,11 +349,9 @@ socket.on('sequence', (seq) => {
 
 
 let clientLettersUsed = document.querySelectorAll('.letter');
-console.log("LETTERS USED : ", clientLettersUsed)
 socket.on('lettersUsedByActualPlayer', (data) => { // data = {playerUuid, tabUsedLetters}
     let playerUuid = data.playerUuid;
     let tabUsedLetters = data.tabUsedLetters;
-    console.log("LETTERS USED CLIENT : ", tabUsedLetters)
     clientLettersUsed.forEach((letter)=>{
         if(tabUsedLetters.includes(letter.id)){
             document.getElementById(`${letter.id}`).classList.add('bg-night-2')
@@ -378,14 +376,14 @@ socket.on('bonus-life', (playerUuid) => {
 
 
 socket.on('player-death', (player) => {
-    console.log("Joueur mort :", player);
+    // console.log("Joueur mort :", player);
     let playerElement = document.getElementById(player.uuid);
     playerElement.classList.add("opacity-20");
     playerElement.classList.remove("active-player"); // S'assurer que le joueur mort n'a pas l'animation
 })
 
 socket.on('game-over', (winner) => {
-    console.log("Partie terminée ! Le gagnant est :", winner);
+    // console.log("Partie terminée ! Le gagnant est :", winner);
     let winnerElement = document.getElementById(winner.uuid);
     winnerElement.classList.add("text-green-500", "font-bold");
     winnerElement.classList.remove("active-player"); // Retirer l'animation du gagnant
