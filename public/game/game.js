@@ -98,7 +98,6 @@ export class Boum {
             this._actualPlayer = actualPlayer;
             return actualPlayer;
         } else {
-            console.log("Aucun joueur en vie !");
             return null; // Retourne null si aucun joueur n'est vivant
         }
     }
@@ -133,14 +132,11 @@ export class Boum {
      */
     startGame(io, gameId) {
         if (!this._inGame) {
-
-            console.log("DÉBUT DE LA PARTIE");
-
             // Start the pre-game timer
             this.startPreGameTimer(io, gameId);
 
         } else {
-            console.log("PARTIE DÉJÀ EN COURS");
+
         }
     }
 
@@ -271,7 +267,7 @@ export class Boum {
                 throw new Error(responseData.message);
             }
 
-            console.log(`Résultat de la partie ${this._id} envoyé au serveur de Comus Party avec succès`);
+            // console.log(`Résultat de la partie ${this._id} envoyé au serveur de Comus Party avec succès`);
             setTimeout(() => {
                 io.to(gameId).emit('redirect', {
                     url: `${config.URL_COMUS}`,
@@ -441,12 +437,12 @@ export class Boum {
 
             // Vérifier si le joueur a collecté toutes les lettres requises
             if (this.verifCorrespondanceLetters(lettersComplet, this._actualPlayer.usedLetters)) {
-                console.log("BONUS DE VIE");
+                // console.log("BONUS DE VIE");
                 this._actualPlayer.life++;
                 io.to(gameId).emit('bonus-life', this._actualPlayer.uuid);
                 this._actualPlayer.usedLetters = [];
             } else {
-                console.log("PAS DE BONUS DE VIE");
+                // console.log("PAS DE BONUS DE VIE");
             }
         }
     }

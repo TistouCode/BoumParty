@@ -75,7 +75,6 @@ closeButton.addEventListener('click', () => {
 
 
 socket.on('game-start', () => {
-    console.log('La partie commence !');
     // timer.classList.add('hidden');
 });
 const ignoredKeys = [
@@ -86,7 +85,7 @@ let inputProposition = document.getElementById('inputProposition');
 inputProposition.addEventListener('keydown', function(event) {
     if (event.key === 'Enter') {
         let proposition = inputProposition.value;
-        console.log("PROPOSITION LORS DE ENTREE: ", proposition)
+        // console.log("PROPOSITION LORS DE ENTREE: ", proposition)
         socket.emit('proposition', proposition);
         // socket.emit('deleteActualPropositionOnTheInput');
         inputProposition.value = '';
@@ -132,7 +131,7 @@ socket.on('word', (dataWord) => { // dataWord = [proposition, validWord, playerU
     playerPropositionElement.textContent = '';
 
     if(validWord===true){ // Si le mot est correct
-        console.log("MOT VALIDE")
+        // console.log("MOT VALIDE")
         playerPropositionElement.textContent = proposition;
         playerPropositionElement.classList.remove("text-red-500")
         playerPropositionElement.classList.add("text-green-500")
@@ -168,7 +167,7 @@ socket.on('word', (dataWord) => { // dataWord = [proposition, validWord, playerU
 
 
     }else if(validWord === false){ // Si le mot est incorrect
-        console.log("MOT INVALIDE")
+        // console.log("MOT INVALIDE")
 
         playerPropositionElement.textContent = proposition;
 
@@ -320,7 +319,7 @@ function updateActualPlayer(playerUuid) {
 
 
 socket.on('you-are-current-player', (playerUuid) => {
-    console.log("Vous êtes le joueur actif !");
+    // console.log("Vous êtes le joueur actif !");
     inputProposition.disabled = false;
     inputProposition.focus();
     currentActualPlayerUuid = playerUuid;
@@ -330,7 +329,7 @@ socket.on('you-are-current-player', (playerUuid) => {
 })
 
 socket.on('you-are-not-current-player', (playerUuid) => {
-    console.log("Vous êtes pas le joueur actif !");
+    // console.log("Vous êtes pas le joueur actif !");
     inputProposition.value = '';
     inputProposition.disabled = true;
 })
@@ -339,7 +338,7 @@ socket.on('you-are-not-current-player', (playerUuid) => {
 let sequence = document.getElementById('sequence');
 
 socket.on('sequence', (seq) => {
-    console.log("Séquence reçue :", seq);
+    // console.log("Séquence reçue :", seq);
     sequence.textContent = seq;
 })
 

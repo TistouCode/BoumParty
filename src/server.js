@@ -117,12 +117,10 @@ app.get('/:gameId/:token', express.json(), (req, res) => {
 });
 
 io.on('connection', (socket) => {
-    console.log('Un utilisateur s\'est connecté');
     const gameId = socket.handshake.query.gameId;
     const token = socket.handshake.query.token;
 
     if (!games.has(gameId)) {
-        console.log("game not found")
         return;
     }
 
@@ -165,7 +163,7 @@ io.on('connection', (socket) => {
 
     // Gérer les propositions de mots
     socket.on('proposition', async (proposition) => {
-        console.log('Proposition reçue:', proposition);
+        // //console.log('Proposition reçue:', proposition);
 
         currentGame._actualPlayer.actualWord = proposition;
         let playerWhoWriteTheProposition = currentGame._actualPlayer;
@@ -183,14 +181,14 @@ io.on('connection', (socket) => {
             // Ajouter le mot au joueur actif
             validWord = true;
             // Changer de joueur
-            console.log("JE RENVOIE A l'USER : ", [proposition, validWord, playerWhoWriteTheProposition.uuid, resProposition[1], resProposition[2]])
+            // //console.log("JE RENVOIE A l'USER : ", [proposition, validWord, playerWhoWriteTheProposition.uuid, resProposition[1], resProposition[2]])
             io.to(gameId).emit('word', [proposition, validWord, playerWhoWriteTheProposition.uuid, resProposition[1], resProposition[2]]);
             currentGame.switchPlayer(io, gameId);
 
         } else {
-            console.log('Mot invalide !');
+            // //console.log('Mot invalide !');
             validWord = false
-            console.log("JE RENVOIE A l'USER : ", [proposition, validWord, playerWhoWriteTheProposition.uuid])
+            // //console.log("JE RENVOIE A l'USER : ", [proposition, validWord, playerWhoWriteTheProposition.uuid])
             io.to(gameId).emit('word', [proposition, validWord, playerWhoWriteTheProposition.uuid]);
         }
 
@@ -210,7 +208,7 @@ io.on('connection', (socket) => {
 
     // Gérer la déconnexion
     socket.on('disconnect', () => {
-        console.log(`${pseudonyme} s'est déconnecté`);
+        // //console.log(`${pseudonyme} s'est déconnecté`);
 
         // Marquer le joueur comme déconnecté
         if (currentGame._scores.has(pseudonyme)) {
@@ -225,13 +223,13 @@ io.on('connection', (socket) => {
         });
 
         // NE PAS CHANGER DE JOUEUR ACTIF
-        console.log("Le joueur reste actif même après sa déconnexion.");
+        //console.log("Le joueur reste actif même après sa déconnexion.");
     });
 });
 
 // Démarrage du serveur
 const PORT = config.PORT;
 server.listen(PORT, () => {
-    console.log(`Serveur Bomb Party démarré sur le port ${PORT}`);
+    ////console.log(`Serveur Bomb Party démarré sur le port ${PORT}`);
 });
 
