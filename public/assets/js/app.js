@@ -115,7 +115,7 @@ socket.on('pre-game-timer', (timeLeft) => {
         pregameOverlay.classList.add('hidden');
 
     }
-    preGameTimer.textContent = "Début de partie dans " + timeLeft + " secondes";
+    preGameTimer.textContent = "Attente du début de partie...";
 });
 
 

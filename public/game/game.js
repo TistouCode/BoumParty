@@ -133,11 +133,12 @@ export class Boum {
      */
     startGame(io, gameId) {
         if (!this._inGame) {
-            this._inGame = true;
+
             console.log("DÉBUT DE LA PARTIE");
 
             // Start the pre-game timer
             this.startPreGameTimer(io, gameId);
+
         } else {
             console.log("PARTIE DÉJÀ EN COURS");
         }
@@ -150,14 +151,14 @@ export class Boum {
      * @details Cette méthode démarre un timer de 10 secondes avant le début de la partie
      */
     startPreGameTimer(io, gameId) {
-        let preGameTimeLeft = 3;
+        let preGameTimeLeft = 5;
         const preGameInterval = setInterval(() => {
             io.to(gameId).emit('pre-game-timer', preGameTimeLeft);
             preGameTimeLeft--;
 
             if (preGameTimeLeft < 0) {
                 clearInterval(preGameInterval);
-
+                this._inGame = true;
                 this.defineFirstPlayer()
 
                 this.switchPlayer(io, gameId);
@@ -182,6 +183,7 @@ export class Boum {
      */
     startTimer(io, gameId) {
         if (!this._intervalRunning) {
+
             this._intervalRunning = true;
             this._timeLeft = this._bombDuration;
             this._interval = setInterval(() => {
@@ -331,10 +333,10 @@ export class Boum {
 
     // Fonction de recherche qui ne modifie pas le tableau original
     searchWord(searchTerm) {
-        const normalizedSearch = removeAccents(searchTerm.toLowerCase());
+        const normalizedSearch = this.removeAccents(searchTerm.toLowerCase());
 
         return frenchWords.filter(word => {
-            const normalizedWord = removeAccents(word.toLowerCase());
+            const normalizedWord = this.removeAccents(word.toLowerCase());
             return normalizedWord === normalizedSearch;
         });
     }
@@ -377,9 +379,6 @@ export class Boum {
         //         return [true, result.nature, result.url];
         //     }
         // }
-
-
-
 
         if (this.searchWord(mot).length > 0) {
             this.addLettresUniques(mot, io, gameId);
