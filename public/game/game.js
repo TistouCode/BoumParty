@@ -122,7 +122,6 @@ export class Boum {
         });
 
         this._currentPlayerSocketId = this._actualPlayer.socketId
-        console.log("Joueur actuel :", this._currentPlayerSocketId);
         io.to(this._currentPlayerSocketId).emit('you-are-current-player', this._actualPlayer.uuid);
     }
 
@@ -188,7 +187,7 @@ export class Boum {
             this._interval = setInterval(() => {
 
                 this._timeLeft--;
-                // console.log("LETTERS USED: ", this._actualPlayer.usedLetters)
+
                 // CHRONO
                 io.to(gameId).emit('timer', this._timeLeft);
                 if (this._timeLeft === 0) {
@@ -209,7 +208,6 @@ export class Boum {
                     }
                     io.to(gameId).emit('boum', this._actualPlayer);
                     this.switchPlayer(io, gameId);
-                    console.log("SOCKET JOUEUR ACTUEL : ", this._actualPlayer.socketId)
                     this._timeLeft = this._bombDuration;
                     io.to(gameId).emit('sequence', this._currentSequence);
                 }
@@ -332,36 +330,34 @@ export class Boum {
 
     async verifierMot(mot, io, gameId) {
 
-        console.log("HAHAHAHAHAHHAHAH")
-
         // URL du dictionnaire de l'Académie française (page de recherche)
-        const url = "https://www.dictionnaire-academie.fr/search";
-
-        // Construction des données du formulaire
-        const formData = new URLSearchParams();
-        formData.append('term', mot);
-        formData.append('options', '1'); // 9e édition du dictionnaire
-
-        // Configuration de la requête POST
-        const options = {
-            method: 'POST',
-            headers: new Headers({
-                'Accept': 'application/json',
-            }),
-            body: formData,
-            // Ne pas définir Content-Type pour FormData (le navigateur le fait automatiquement)
-        };
-        // Envoi de la requête
-        const response = await fetch(url, options);
-        const responseData = await response.json();
-        if (responseData.result.length > 0) {
-            const result = responseData.result[0];
-            let scoreBrut = result.score;
-            if (scoreBrut > 0.95) {
-                this.addLettresUniques(mot, io, gameId);
-                return [true, result.nature, result.url];
-            }
-        }
+        // const url = "https://www.dictionnaire-academie.fr/search";
+        //
+        // // Construction des données du formulaire
+        // const formData = new URLSearchParams();
+        // formData.append('term', mot);
+        // formData.append('options', '1'); // 9e édition du dictionnaire
+        //
+        // // Configuration de la requête POST
+        // const options = {
+        //     method: 'POST',
+        //     headers: new Headers({
+        //         'Accept': 'application/json',
+        //     }),
+        //     body: formData,
+        //     // Ne pas définir Content-Type pour FormData (le navigateur le fait automatiquement)
+        // };
+        // // Envoi de la requête
+        // const response = await fetch(url, options);
+        // const responseData = await response.json();
+        // if (responseData.result.length > 0) {
+        //     const result = responseData.result[0];
+        //     let scoreBrut = result.score;
+        //     if (scoreBrut > 0.95) {
+        //         this.addLettresUniques(mot, io, gameId);
+        //         return [true, result.nature, result.url];
+        //     }
+        // }
         if (frenchWords.includes(mot)) {
             this.addLettresUniques(mot, io, gameId);
             return true
@@ -369,29 +365,6 @@ export class Boum {
             return false
         }
     }
-
-
-    /**
-     * Fonction qui vérifie si toutes les lettres du premier tableau sont incluses dans le deuxième tableau
-     * @param {string[]} tableau1 - Tableau de lettres à vérifier
-     * @param {string[]} tableau2 - Tableau de référence
-     * @returns {boolean} - Vrai si toutes les lettres de tableau1 sont dans tableau2, faux sinon
-     */
-    // toutesLettresIncluses(tableau1, tableau2) {
-    //     // Vérifie chaque lettre du premier tableau
-    //     console.log("TABLEAU1 : ", tableau1)
-    //     console.log("TABLEAU2 : ", tableau2)
-    //     for (let i = 0; i < tableau1.length; i++) {
-    //         // Si une lettre n'est pas dans le deuxième tableau, retourne faux
-    //         if (!tableau2.includes(tableau1[i])) {
-    //             console.log("FAUX")
-    //             return false;
-    //         }
-    //     }
-    //     console.log("VRAI")
-    //     // Si toutes les lettres sont incluses, retourne vrai
-    //     return true;
-    // }
 
     /**
      * Vérifie si toutes les lettres du joueur sont incluses dans le tableau de référence
@@ -416,8 +389,6 @@ export class Boum {
      * @param {string} gameId - ID de la partie
      */
     addLettresUniques(mot, io, gameId) {
-        console.log("DANS ADDLETTRESUNIQUES : ", mot);
-
         // Tableau des lettres non conformes
         const lettreNonConforme = ['w', 'x', 'y', 'z'];
 

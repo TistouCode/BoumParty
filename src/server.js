@@ -175,7 +175,6 @@ io.on('connection', (socket) => {
         currentGame._actualPlayer._alreadyPutAProposition = true;
         // resProposition = [bool, natureWord, URlWord]
         let resProposition = await currentGame.isValidWord(proposition, currentGame._currentSequence, currentGame._usedWords, io, gameId);
-        console.log(resProposition);
         if (resProposition[0]) {
 
             // Ajouter le mot à la liste des mots utilisés
@@ -198,7 +197,6 @@ io.on('connection', (socket) => {
     })
 
     socket.on('typing', (key) => {
-        console.log("KEY : ", key)
         io.to(gameId).emit('typingKey', {
             playerUuid: currentGame._actualPlayer.uuid,
             key: key,

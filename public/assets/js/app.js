@@ -99,13 +99,10 @@ inputProposition.addEventListener('keydown', function(event) {
 
 socket.on('typingKey', (data) => { // data = [playerUuid, key]
 
-    console.log("TYPING : ", data[0])
-
     let playerUuid = data.playerUuid;
     let key = data.key;
     let alreadyPutAProposition = data.alreadyPutAProposition;
 
-    console.log("KEY : ", key)
     let propositionPlayerInLive = document.getElementById(`${playerUuid}-proposition`);
     propositionPlayerInLive.textContent = inputProposition.value
 })
@@ -125,7 +122,6 @@ socket.on('pre-game-timer', (timeLeft) => {
 
 // Signal reçu lorsqu'un mot est validé
 socket.on('word', (dataWord) => { // dataWord = [proposition, validWord, playerUuid, natureMot, definitionURL]
-    console.log('Mot reçu :', dataWord);
     let proposition = dataWord[0];
     let validWord = dataWord[1];
     let playerUuid = dataWord[2];
@@ -298,7 +294,6 @@ socket.on('boum', (player)=>{
 let currentActualPlayerUuid = null;
 socket.on('actual-player', (dataPlayer) => { // dataPlayer = {uuid, life}
     updateActualPlayer(dataPlayer.uuid);
-    console.log("CLIENT j'ai le socket id : ", socket.id)
 });
 
 function updateActualPlayer(playerUuid) {
@@ -328,7 +323,6 @@ socket.on('you-are-current-player', (playerUuid) => {
     console.log("Vous êtes le joueur actif !");
     inputProposition.disabled = false;
     inputProposition.focus();
-    console.log("YOU ARE CURRENT : ", playerUuid)
     currentActualPlayerUuid = playerUuid;
 
 
@@ -356,16 +350,12 @@ socket.on('sequence', (seq) => {
 
 
 let clientLettersUsed = document.querySelectorAll('.letter');
-clientLettersUsed.forEach((letter)=>{
-    console.log(letter.id)
-})
 console.log("LETTERS USED : ", clientLettersUsed)
 socket.on('lettersUsedByActualPlayer', (data) => { // data = {playerUuid, tabUsedLetters}
     let playerUuid = data.playerUuid;
     let tabUsedLetters = data.tabUsedLetters;
     console.log("LETTERS USED CLIENT : ", tabUsedLetters)
     clientLettersUsed.forEach((letter)=>{
-        console.log(letter.id)
         if(tabUsedLetters.includes(letter.id)){
             document.getElementById(`${letter.id}`).classList.add('bg-night-2')
         }
@@ -381,8 +371,6 @@ socket.on('bonus-life', (playerUuid) => {
     heartList.appendChild(heart);
 
     clientLettersUsed.forEach((letter)=>{
-        console.log(letter.id)
-
         document.getElementById(`${letter.id}`).classList.remove('bg-night-2')
         document.getElementById(`${letter.id}`).classList.add('bg-lavender-blush-1')
 
