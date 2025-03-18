@@ -33,7 +33,7 @@ app.use('/src', express.static(path.join(__dirname, '../src')));
 
 
 
-// Route pour la page de jeu
+
 const games = new Map();
 
 // Constantes uniques pour l'ensemble des parties
@@ -64,6 +64,7 @@ app.post('/:gameId/init', express.json(), (req, res) => {
     }
     try{
         games.set(gameId, new Boum(gameId, settings.bombDuration, settings.lifePerPlayer, players, false, gameToken));
+
         res.status(200).json({
             success: true,
             message: "Partie initialisée avec succès"
@@ -151,9 +152,10 @@ io.on('connection', (socket) => {
 
     // Envoyer immédiatement l'état du joueur actuel au nouvel utilisateur
     if (currentGame._actualPlayer) {
+        console.log("actual-player")
         socket.emit('actual-player', currentGame._actualPlayer.uuid);
         socket.emit('sequence', currentGame._currentSequence);
-        socket.emit('timer', currentGame._timeLeft);
+        // socket.emit('timer', currentGame._timeLeft);
         socket.emit('word', currentGame._actualPlayer.actualWord);
         // socket.emit('timer', currentGame._bombDuration);
     }
@@ -225,7 +227,13 @@ io.on('connection', (socket) => {
         // NE PAS CHANGER DE JOUEUR ACTIF
         //console.log("Le joueur reste actif même après sa déconnexion.");
     });
+    socket.on('game-over-delete-game', ()=>{
+        games.delete(gameId);
+        console.log("Partie Supprimer")
+    })
 });
+
+
 
 // Démarrage du serveur
 const PORT = config.PORT;

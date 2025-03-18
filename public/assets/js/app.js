@@ -74,9 +74,9 @@ closeButton.addEventListener('click', () => {
 
 
 
-socket.on('game-start', () => {
-    // timer.classList.add('hidden');
-});
+// socket.on('game-start', () => {
+//     // timer.classList.add('hidden');
+// });
 const ignoredKeys = [
     'Enter', 'Control', 'Shift', 'Alt', 'Tab', 'CapsLock', 'Escape', 'ArrowLeft', 'ArrowRight',
     'ArrowUp', 'ArrowDown','Meta'
@@ -400,7 +400,7 @@ socket.on('game-over', (winner) => {
     document.getElementById("divPlayer").appendChild(victoryMessage);
 
     inputProposition.disabled = true;
-
+    socket.emit('game-over-delete-game')
 
 });
 

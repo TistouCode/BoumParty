@@ -160,7 +160,7 @@ export class Boum {
                 this.switchPlayer(io, gameId);
 
                 this._actualPlayer.play = true;
-                io.to(gameId).emit('game-start');
+                // io.to(gameId).emit('game-start');
                 io.to(gameId).emit('actual-player', {
                      uuid: this._actualPlayer.uuid,
                      life : this._actualPlayer.life
