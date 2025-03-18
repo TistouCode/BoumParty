@@ -17,6 +17,8 @@ const app = express(); // Créer une application Express
 const server = http.createServer(app); // Créer un serveur HTTP
 const io = new socketIo(server); // Créer une instance de Socket.IO
 
+import frenchWords from 'an-array-of-french-words/index.json' with {type: 'json'};
+
 app.use(express.urlencoded({ extended: true })); // Pour traiter les formulaires HTML
 app.use(express.json()); // Pour traiter le JSON (si besoin)
 
@@ -29,8 +31,6 @@ app.use('/src', express.static(path.join(__dirname, '../src')));
 app.use(express.static(path.join(__dirname, '../public')));
 
 app.use('/src', express.static(path.join(__dirname, '../src')));
-
-
 
 
 

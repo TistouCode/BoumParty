@@ -7,6 +7,51 @@ let indexJoueur = Math.floor(Math.random() * 1000) % 3;
 
 
 
+
+function removeAccents(str) {
+    return str.normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/œ/g, "oe")
+        .replace(/æ/g, "ae")
+        .replace(/ç/g, "c");
+}
+
+
+const frenchWordsWithoutAccent = [];
+
+if (Array.isArray(frenchWords)) {
+    // Traiter chaque élément du tableau
+    for (let i = 0; i < frenchWords.length; i++) {
+        if (typeof frenchWords[i] === 'string') {
+            // Si l'élément est une chaîne, créer une version sans accents
+            frenchWordsWithoutAccent.push(removeAccents(frenchWords[i]));
+        } else if (typeof frenchWords[i] === 'object') {
+            // Si l'élément est un objet, créer un nouvel objet sans accents
+            const newObj = {};
+            for (const key in frenchWords[i]) {
+                if (typeof frenchWords[i][key] === 'string') {
+                    newObj[key] = removeAccents(frenchWords[i][key]);
+                } else {
+                    newObj[key] = frenchWords[i][key];
+                }
+            }
+            frenchWordsWithoutAccent.push(newObj);
+        } else {
+            // Si l'élément n'est pas une chaîne ou un objet, le copier tel quel
+            frenchWordsWithoutAccent.push(frenchWords[i]);
+        }
+    }
+}
+
+// Afficher le nouveau tableau
+console.log(frenchWordsWithoutAccent);
+
+
+
+
+
+
+
 // Fichier game.js
 
 /**
@@ -108,6 +153,9 @@ export class Boum {
      * @param gameId Identifiant de la partie
      */
     switchPlayer(io, gameId) {
+
+// Créer un nouveau tableau sans accents
+
         this.drawActualPlayer();
         this._currentSequence = this.generateSequence();
         io.to(gameId).emit('sequence', this._currentSequence);
@@ -147,7 +195,7 @@ export class Boum {
      * @details Cette méthode démarre un timer de 10 secondes avant le début de la partie
      */
     startPreGameTimer(io, gameId) {
-        let preGameTimeLeft = 5;
+        let preGameTimeLeft = 3;
         const preGameInterval = setInterval(() => {
             io.to(gameId).emit('pre-game-timer', preGameTimeLeft);
             preGameTimeLeft--;
@@ -328,14 +376,14 @@ export class Boum {
     }
 
     // Fonction de recherche qui ne modifie pas le tableau original
-    searchWord(searchTerm) {
-        const normalizedSearch = this.removeAccents(searchTerm.toLowerCase());
-
-        return frenchWords.filter(word => {
-            const normalizedWord = this.removeAccents(word.toLowerCase());
-            return normalizedWord === normalizedSearch;
-        });
-    }
+    // searchWord(searchTerm) {
+    //     const normalizedSearch = this.removeAccents(searchTerm.toLowerCase());
+    //
+    //     return frenchWords.filter(word => {
+    //         const normalizedWord = this.removeAccents(word.toLowerCase());
+    //         return normalizedWord === normalizedSearch;
+    //     });
+    // }
 
 
     /**
@@ -376,7 +424,7 @@ export class Boum {
         //     }
         // }
 
-        if (this.searchWord(mot).length > 0) {
+        if (frenchWordsWithoutAccent.includes(mot)) {
             this.addLettresUniques(mot, io, gameId);
             return true
         } else {
